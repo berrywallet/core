@@ -16,7 +16,7 @@ export default class EthereumRopstenTestnet extends Ethereum {
         return 60;
     }
 
-    readonly defaultGasPrice: BigNumber = new BigNumber(5).div(Constants.GWEI_PER_COIN); //5 GWei
+    readonly defaultGasPrice: BigNumber = new BigNumber(8).div(Constants.GWEI_PER_COIN); //5 GWei
 
     readonly chainId: number = 3;
 }

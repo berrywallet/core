@@ -11,15 +11,21 @@ export default class TransactionProvider extends SimpleProvider {
             throw new Error("Impossible adding transaction!");
         }
 
-        let newTx, oldTx = this.get(tx.txid);
+        let newTx, oldTx = this.get(tx.txid),
+            emitEvent: string;
 
         if (oldTx) {
             newTx = Object.assign({}, oldTx, tx);
+
+            if (!oldTx.blockHash && tx.blockHash) {
+                emitEvent = 'tx:confirm';
+            }
         } else {
             newTx = {
                 ...tx,
                 receiveTime: new Date().getTime()
-            }
+            };
+            emitEvent = 'tx:new';
         }
 
         this.setData({
@@ -28,6 +34,10 @@ export default class TransactionProvider extends SimpleProvider {
                 [tx.txid]: newTx
             }
         });
+
+        if (emitEvent) {
+            this.emitEvent(emitEvent, newTx);
+        }
     }
 
     /**

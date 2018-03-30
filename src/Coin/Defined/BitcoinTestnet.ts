@@ -35,6 +35,6 @@ export default class BitcoinTestnet extends BIPGenericCoin {
     }
 
     get defaultFeePerByte(): BigNumber {
-        return new BigNumber(4).div(Constants.SATOSHI_PER_COIN); //7 satoshis
+        return new BigNumber(8).div(Constants.SATOSHI_PER_COIN); //7 satoshis
     }
 }

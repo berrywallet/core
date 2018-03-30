@@ -11,8 +11,9 @@ import {PrivateProviderInterface, createPrivateProvider} from "./Providers/Priva
 import {Destructable} from "../../Utils/Destructable";
 
 export type WalletDataListener = (newWd: Entity.WalletData, oldWd: Entity.WalletData) => void;
+import {EventEmitter} from 'events';
 
-class WDProvider implements Destructable {
+class WDProvider extends EventEmitter implements Destructable {
     protected walletData: Entity.WalletData;
     protected eventListeners: WalletDataListener[] = [];
     protected networkProvider: Networking.NetworkProvider;
@@ -21,6 +22,8 @@ class WDProvider implements Destructable {
      * @param {WalletData} walletData
      */
     constructor(walletData: Entity.WalletData) {
+        super();
+        
         this.walletData = {...walletData};
     }
 

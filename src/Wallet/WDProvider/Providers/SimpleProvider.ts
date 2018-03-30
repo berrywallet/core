@@ -26,4 +26,12 @@ export default class SimpleProvider {
     protected getCoin(): CoinInterface {
         return this.wdProvider.coin;
     }
+
+    /**
+     * @param {string} event
+     * @param args
+     */
+    protected emitEvent(event: string, ...args: any[]): boolean {
+        return this.wdProvider.emit(event, ...args)
+    }
 }
