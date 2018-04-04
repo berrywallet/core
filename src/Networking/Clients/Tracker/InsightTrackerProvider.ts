@@ -1,4 +1,6 @@
 import {each, reduce, find} from 'lodash';
+import debugCreator from 'debug';
+import {parse as urlParcer} from "url";
 import {Wallet} from '../../../';
 import {InsightNetworkClient} from '../';
 import {TrackerClient} from './';
@@ -10,6 +12,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
     socket: SocketIOClient.Socket;
     connected: boolean;
     enableReconnect: boolean = true;
+    debug: any;
 
     /**
      * @param {InsightNetworkClient} networkClient
@@ -19,12 +22,16 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
 
         this.connected = false;
 
+        const wsUrl = urlParcer(this.networkClient.getWSUrl());
+        this.debug = debugCreator("berrywallet:SOCKET:" + wsUrl.host);
+
         setTimeout(() => {
             this.createSocketConnection();
         }, 1);
     }
 
     createSocketConnection() {
+
         this.socket = io.connect(this.networkClient.getWSUrl(), {
             timeout: 1000,
             autoConnect: false,
@@ -33,21 +40,21 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
         });
 
         this.socket.on('connect', () => {
-            console.log('Socket connected!');
+            this.debug('Socket connected!');
 
             setTimeout(this.fireConnect.bind(this), 500);
         });
 
         this.socket.on('error', (error) => {
-            console.error(error);
-            console.log('Socket connection error');
+            this.debug(error);
+            this.debug('Socket connection error');
             this.fireConnectionError(error);
 
             this.reconnectSocket();
         });
 
         this.socket.on('connect_timeout', (timeout) => {
-            console.log('Socket connection timeout');
+            this.debug('Socket connection timeout');
 
             this.reconnectSocket();
         });
@@ -91,7 +98,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
             this.socket.close();
             delete this.socket;
         }
-        console.log('Start reconnecting...');
+        this.debug('Start reconnecting...');
 
         setTimeout(() => {
             this.createSocketConnection();
@@ -100,7 +107,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
 
     protected fireConnect(): boolean {
         if (!this.socket) {
-            throw new Error('No socket connection');
+            throw new Error('No socket connection for ' + this.networkClient.getWSUrl());
         }
 
         this.socket.emit('subscribe', 'inv');

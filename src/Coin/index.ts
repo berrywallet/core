@@ -66,7 +66,7 @@ coinMap[Unit.ETH] = Defined.Ethereum;
 coinMap[Unit.LTC] = Defined.Litecoin;
 coinMap[Unit.DASH] = Defined.Dash;
 
-coinMap[Unit.BTCt] = Defined.BitcoinTestnet; // Bitcoin Testnet
+coinMap[Unit.BTCt] = Defined.BitcoinTestnet;
 coinMap[Unit.ETHt] = Defined.EthereumRopstenTestnet;
 coinMap[Unit.LTCt] = Defined.LitecoinTestnet;
 coinMap[Unit.DASHt] = Defined.DashTestnet;

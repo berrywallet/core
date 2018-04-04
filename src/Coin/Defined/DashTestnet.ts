@@ -35,6 +35,6 @@ export default class DashTestnet extends BIPGenericCoin {
     }
 
     get defaultFeePerByte(): BigNumber {
-        return new BigNumber(8).div(Constants.SATOSHI_PER_COIN); //4 satoshi
+        return new BigNumber(8).div(Constants.SATOSHI_PER_COIN);
     }
 }

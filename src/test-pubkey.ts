@@ -5,7 +5,7 @@ import {Coin, Networking, Wallet} from './';
 import debuger from 'debug';
 const BIP39 = require('bip39');
 
-const debug = debuger('test-pubkey');
+const debug = debuger('berrywallet:test-pubkey');
 
 const coin = Coin.makeCoin(Coin.Unit.LTCt);
 const networkProvider = new Networking.NetworkProvider(coin);

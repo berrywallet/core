@@ -23,7 +23,7 @@ export default class InsightNetworkClient extends NetworkClient {
         if (false === (coin instanceof Coin.BIPGenericCoin)) {
             throw new Error('Insigne network for BIP Coin only');
         }
-
+        
         super(coin, options);
 
         this.client = Axios.create({
@@ -85,29 +85,27 @@ export default class InsightNetworkClient extends NetworkClient {
     }
 
     getFeesPerKB(): Promise<Dictionary<BigNumber>> {
-        const defaultFee = (this.coin as BIPGenericCoin).defaultFeePerByte;
-
-        const resolveFeePerByte = (data, index): BigNumber => {
+        const resolveFeePerByte = (data, index, defaultFeeProp: string): BigNumber => {
             if (data[index] > 0) {
                 return new BigNumber(data[index]).div(1024).round(8);
             }
 
-            return defaultFee.mul(6 / index).round(8);
+            return this.coin[defaultFeeProp];
         };
 
         const onRequestSuccess = (data: any) => {
             return {
-                low: resolveFeePerByte(data, 12),
-                standard: resolveFeePerByte(data, 3),
-                high: resolveFeePerByte(data, 1)
+                low: resolveFeePerByte(data, 12, 'lowFeePerByte'),
+                standard: resolveFeePerByte(data, 3, 'defaultFeePerByte'),
+                high: resolveFeePerByte(data, 1, 'highFeePerByte')
             }
         };
 
         const onRequestError = () => {
             return {
-                low: defaultFee.div(2),
-                standard: defaultFee,
-                high: defaultFee.mul(5)
+                low: (this.coin as BIPGenericCoin).lowFeePerByte,
+                standard: (this.coin as BIPGenericCoin).defaultFeePerByte,
+                high: (this.coin as BIPGenericCoin).highFeePerByte
             }
         };
 

@@ -70,10 +70,14 @@ export class BIPPrivateProvider extends AbstractPrivateProvider {
         const utxos = chain(balance.utxo)
             .filter({confirmed: true})
             .map((inp: Entity.UnspentTXOutput) => {
+                const curAddress = inp.addresses[0];
                 return {
                     txId: inp.txid,
                     vout: inp.index,
-                    address: inp.addresses[0],
+                    address: curAddress,
+                    
+                    // @TODO review this peas with 'coinselect' npm library
+                    script: {length: 107},
                     value: inp.value.mul(Constants.SATOSHI_PER_COIN).toNumber()
                 };
             })

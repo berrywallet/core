@@ -7,13 +7,16 @@ import {TrackerClient} from './';
 
 const NEW_BLOCK_CHECK_TIMEOUT = 15000;
 const RECONNECT_TIMEOUT = 30000;
+const CONNECTION_TIMEOUT = 60000 * 10;
 
 export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
 
-    protected currentBlockHeight: number;
-    protected blockCheckTimeout;
+    protected currentBlockHeight?: number;
+    protected currentBlockTime?: number;
+
     protected enableBlockTracking: boolean = false;
     protected connected: boolean = false;
+    protected blockTrackInterval?: any;
 
     /**
      * @param {InfuraNetworkClient} networkClient
@@ -25,9 +28,10 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
     }
 
     handleBlockError = (error) => {
-        if (this.blockCheckTimeout) {
-            clearTimeout(this.blockCheckTimeout);
+        if (this.blockTrackInterval) {
+            clearInterval(this.blockTrackInterval);
             this.currentBlockHeight = null;
+            this.currentBlockTime = null;
         }
 
         this.fireConnectionError(error);
@@ -47,17 +51,13 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
     protected startBlockTracking() {
 
         this.enableBlockTracking = true;
-        const handleResponse = (block) => {
-            this.checkConnection();
 
-            this.fireNewBlock(block);
-            this.trackNextBlock();
-        };
+        this.trackLastOrNextBlock();
 
-        this.networkClient
-            .getBlockByNumber('latest')
-            .then(handleResponse)
-            .catch(this.handleBlockError);
+        this.blockTrackInterval = setInterval(() => {
+            this.trackLastOrNextBlock();
+        }, NEW_BLOCK_CHECK_TIMEOUT);
+
     }
 
     /**
@@ -65,6 +65,7 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
      */
     protected fireNewBlock(block: Wallet.Entity.Block): boolean {
         this.currentBlockHeight = block.height;
+        this.currentBlockTime = block.time;
 
         const originalResponse: Infura.Block = block.original;
         if (originalResponse) {
@@ -98,32 +99,36 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
         return true;
     }
 
-    protected checkConnection() {
+    protected activateConnection() {
         if (!this.connected) {
             this.connected = true;
             this.fireConnect();
         }
     }
 
-    protected trackNextBlock() {
+    protected trackLastOrNextBlock(): Promise<Wallet.Entity.Block | null> {
         if (!this.enableBlockTracking) {
             return;
         }
 
         const handleResponse = (block: Wallet.Entity.Block = null) => {
+            this.activateConnection();
+
             if (block) {
                 this.fireNewBlock(block);
-                this.trackNextBlock();
-                return;
-            }
+                this.trackLastOrNextBlock();
 
-            this.blockCheckTimeout = setTimeout(() => {
-                this.trackNextBlock();
-            }, NEW_BLOCK_CHECK_TIMEOUT);
+                return block;
+            }
         };
 
-        this.networkClient
-            .getBlockByNumber(this.currentBlockHeight ? this.currentBlockHeight + 1 : 'latest')
+        let blockHeight: string | number = 'latest';
+        if (this.currentBlockHeight && (new Date().getTime() - this.currentBlockTime < CONNECTION_TIMEOUT)) {
+            blockHeight = this.currentBlockHeight + 1;
+        }
+
+        return this.networkClient
+            .getBlockByNumber(blockHeight)
             .then(handleResponse)
             .catch(this.handleBlockError);
     }
@@ -131,8 +136,8 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
     destruct() {
         this.enableBlockTracking = false;
 
-        if (this.blockCheckTimeout) {
-            clearTimeout(this.blockCheckTimeout);
+        if (this.blockTrackInterval) {
+            clearInterval(this.blockTrackInterval);
         }
 
         super.destruct();

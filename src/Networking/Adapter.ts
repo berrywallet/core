@@ -1,7 +1,5 @@
-import {AdapterOptionInterface, AdapterPropsInterface} from "./Api";
+import {AdapterPropsInterface} from "./Api";
 import * as Coin from "../Coin";
-import {BIPCoinOptions} from "../Coin/Options";
-import * as Api from "./Api";
 
 enum AdapterType {
     INSIGHT = 'insight',
@@ -18,15 +16,16 @@ const AdapterMap = [];
 AdapterMap[Coin.Unit.BTC] = [{
     type: AdapterType.INSIGHT,
     options: {
-        url: 'https://insight.bitpay.com/api',
-        wsUrl: 'wss://insight.bitpay.com',
+        url: 'https://btc-bitcore1.trezor.io/api',
+        wsUrl: 'wss://btc-bitcore1.trezor.io',
         version: '0.4.3'
     }
 }, {
-    type: AdapterType.BLOCKCYPHER_BIP,
+    type: AdapterType.INSIGHT,
     options: {
-        url: 'https://api.blockcypher.com/v1/btc/main',
-        wsUrl: 'wss://socket.blockcypher.com/v1/btc/main'
+        url: 'https://insight.bitpay.com/api',
+        wsUrl: 'wss://insight.bitpay.com',
+        version: '0.4.3'
     }
 }, {
     type: AdapterType.INSIGHT,
@@ -43,12 +42,6 @@ AdapterMap[Coin.Unit.BTCt] = [{
         wsUrl: 'wss://test-insight.bitpay.com',
         version: '0.4.3'
     }
-}, {
-    type: AdapterType.BLOCKCYPHER_BIP,
-    options: {
-        url: 'https://api.blockcypher.com/v1/btc/test3',
-        wsUrl: 'wss://socket.blockcypher.com/v1/btc/test3'
-    }
 }];
 
 
@@ -56,15 +49,16 @@ AdapterMap[Coin.Unit.BTCt] = [{
 AdapterMap[Coin.Unit.LTC] = [{
     type: AdapterType.INSIGHT,
     options: {
-        url: 'https://insight.litecore.io/api',
-        wsUrl: 'wss://insight.litecore.io/',
+        url: 'https://ltc-bitcore1.trezor.io/api',
+        wsUrl: 'wss://ltc-bitcore1.trezor.io/',
         version: '0.4.4'
     }
 }, {
-    type: AdapterType.BLOCKCYPHER_BIP,
+    type: AdapterType.INSIGHT,
     options: {
-        url: 'https://api.blockcypher.com/v1/ltc/main',
-        wsUrl: 'wss://socket.blockcypher.com/v1/ltc/main'
+        url: 'https://insight.litecore.io/api',
+        wsUrl: 'wss://insight.litecore.io/',
+        version: '0.4.4'
     }
 }];
 
@@ -82,14 +76,14 @@ AdapterMap[Coin.Unit.LTCt] = [{
 AdapterMap[Coin.Unit.DASH] = [{
     type: AdapterType.INSIGHT,
     options: {
-        url: 'https://insight.dash.org/insight-api-dash',
-        wsUrl: 'https://insight.dash.org/'
+        url: 'https://dash-bitcore1.trezor.io/api',
+        wsUrl: 'https://dash-bitcore1.trezor.io/'
     }
 }, {
-    type: AdapterType.BLOCKCYPHER_BIP,
+    type: AdapterType.INSIGHT,
     options: {
-        url: 'https://api.blockcypher.com/v1/dash/main',
-        wsUrl: 'wss://socket.blockcypher.com/v1/dash/main'
+        url: 'https://insight.dash.org/insight-api-dash',
+        wsUrl: 'wss://insight.dash.org/'
     }
 }];
 
@@ -98,7 +92,7 @@ AdapterMap[Coin.Unit.DASHt] = [{
     type: AdapterType.INSIGHT,
     options: {
         url: 'https://testnet-insight.dashevo.org/insight-api-dash',
-        wsUrl: 'wss://testnet-insight.dashevo.org/'
+        wsUrl: 'https://testnet-insight.dashevo.org/'
     }
 }];
 

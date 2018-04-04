@@ -1,8 +1,7 @@
 import * as Coin from "./";
 import {Network} from "bitcoinjs-lib";
-import * as Constants from "../Constants"
+import {SATOSHI_PER_COIN} from "../Constants"
 import BigNumber from "bignumber.js";
-import {BIPTransaction} from "./Transaction";
 
 export abstract class BIPGenericCoin implements Coin.CoinInterface {
 
@@ -45,6 +44,14 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
         return Coin.Private.BasicMasterNode.fromSeedBuffer(seed, this);
     }
 
+    get lowFeePerByte(): BigNumber {
+        return this.defaultFeePerByte.div(2);
+    }
+
+    get highFeePerByte(): BigNumber {
+        return this.defaultFeePerByte.mul(4);
+    }
+
     abstract getUnit(): Coin.Unit;
 
     abstract getName(): string;
@@ -57,5 +64,5 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
 
     abstract get defaultFeePerByte(): BigNumber;
 
-    readonly minValue: BigNumber = new BigNumber(1).div(Constants.SATOSHI_PER_COIN);
+    readonly minValue: BigNumber = new BigNumber(1).div(SATOSHI_PER_COIN);
 }
