@@ -44,6 +44,6 @@
         "web3": "^1.0.0-beta.30"
     },
     "devDependencies": {
-        "typescript": "2.6.2"
+        "typescript": "2.7.2"
     }
 }
