@@ -35,6 +35,10 @@ export default class LitecoinTestnet extends BIPGenericCoin {
     }
 
     get defaultFeePerByte(): BigNumber {
-        return new BigNumber(10).div(Constants.SATOSHI_PER_COIN);
+        return new BigNumber(200).div(Constants.SATOSHI_PER_COIN);
+    }
+
+    get minFeePerByte(): BigNumber {
+        return new BigNumber(98).div(Constants.SATOSHI_PER_COIN);
     }
 }

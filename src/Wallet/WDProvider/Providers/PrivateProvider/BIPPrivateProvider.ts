@@ -4,7 +4,6 @@ import {Coin, Constants, HD} from "../../../../";
 import {Entity} from "../../../";
 import {AbstractPrivateProvider} from './AbstractPrivateProvider';
 import InsightNetworkClient from "../../../../Networking/Clients/InsightNetworkClient";
-import {BIPGenericCoin} from "../../../../Coin";
 
 const coinSelect = require('coinselect');
 
@@ -38,6 +37,10 @@ export class BIPPrivateProvider extends AbstractPrivateProvider {
                     case Coin.FeeTypes.Low:
                         responseFee = fees.low;
                         break;
+                }
+
+                if (responseFee < coin.minFeePerByte) {
+                    responseFee = coin.minFeePerByte;
                 }
 
                 return responseFee.mul(Constants.SATOSHI_PER_COIN).toNumber();
@@ -75,7 +78,7 @@ export class BIPPrivateProvider extends AbstractPrivateProvider {
                     txId: inp.txid,
                     vout: inp.index,
                     address: curAddress,
-                    
+
                     // @TODO review this peas with 'coinselect' npm library
                     script: {length: 107},
                     value: inp.value.mul(Constants.SATOSHI_PER_COIN).toNumber()
@@ -121,7 +124,10 @@ export class BIPPrivateProvider extends AbstractPrivateProvider {
      *
      * @returns {Promise<BigNumber>}
      */
-    calculateFee(value: BigNumber, address: Coin.Key.Address, feeType: Coin.FeeTypes = Coin.FeeTypes.Medium): Promise<BigNumber> {
+    calculateFee(value: BigNumber,
+                 address: Coin.Key.Address,
+                 feeType: Coin.FeeTypes = Coin.FeeTypes.Medium): Promise<BigNumber> {
+
         return new Promise<BigNumber>((resolve) => {
             const balance = this.wdProvider.balance;
 

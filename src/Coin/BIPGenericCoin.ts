@@ -52,6 +52,10 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
         return this.defaultFeePerByte.mul(4);
     }
 
+    get minFeePerByte(): BigNumber {
+        return new BigNumber(1).div(SATOSHI_PER_COIN);
+    }
+
     abstract getUnit(): Coin.Unit;
 
     abstract getName(): string;
