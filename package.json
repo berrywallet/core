@@ -1,6 +1,6 @@
 {
     "name": "@berrywallet/core",
-    "version": "0.2.2-dev.2",
+    "version": "0.2.2-dev.3",
     "description": "",
     "scripts": {
         "build": "rm -rf ./dist && tsc",
