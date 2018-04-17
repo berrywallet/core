@@ -39,7 +39,7 @@ export class BIPPrivateProvider extends AbstractPrivateProvider {
                         break;
                 }
 
-                if (responseFee < coin.minFeePerByte) {
+                if (responseFee.lessThan(coin.minFeePerByte)) {
                     responseFee = coin.minFeePerByte;
                 }
 

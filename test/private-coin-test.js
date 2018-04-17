@@ -1,3 +1,4 @@
+const BitcoinJS = require("bitcoinjs-lib");
 const Berrywallet = require('../dist');
 const BIP39 = require('bip39');
 const mnemonicSeed = 'flag output rich laptop hub lift list scout enjoy topic sister lab';
@@ -10,6 +11,7 @@ const bufferSeed = BIP39.mnemonicToSeed(mnemonicSeed);
 
 
 const Coin = Berrywallet.Coin;
+const Utils = Berrywallet.Utils;
 
 const testPrivateCoinMethods = () => {
     const coin = Coin.makeCoin(Coin.Unit.BTC);

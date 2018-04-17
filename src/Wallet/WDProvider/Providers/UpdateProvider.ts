@@ -1,4 +1,4 @@
-import {Provider} from "../../index";
+import {Provider} from "../../";
 
 const queue = require('queue');
 import {map, each, chunk} from 'lodash';

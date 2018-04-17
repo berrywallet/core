@@ -4,7 +4,7 @@ import * as Key from "../Key";
 import * as Utils from "../../Utils";
 import * as Constants from "../../Constants";
 
-import {CoinInterface, TransactionScheme} from "../index";
+import {CoinInterface, TransactionScheme} from "../";
 import {Transaction} from './Transaction';
 import {Ethereum} from "../Defined";
 

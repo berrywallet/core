@@ -1,4 +1,4 @@
-import * as Key from "./index";
+import * as Key from "./";
 import * as BitcoinJS from "bitcoinjs-lib";
 import * as Utils from "../../Utils";
 import {BIPCoinOptions} from "../Options";

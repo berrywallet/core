@@ -49,6 +49,13 @@ AdapterMap[Coin.Unit.BTCt] = [{
 AdapterMap[Coin.Unit.LTC] = [{
     type: AdapterType.INSIGHT,
     options: {
+        url: 'https://ltc.explorer.berrywallet.io/api',
+        wsUrl: 'wss://ltc.explorer.berrywallet.io/',
+        version: '0.4.4'
+    }
+}, {
+    type: AdapterType.INSIGHT,
+    options: {
         url: 'https://ltc-bitcore1.trezor.io/api',
         wsUrl: 'wss://ltc-bitcore1.trezor.io/',
         version: '0.4.4'
