@@ -1,6 +1,6 @@
-import {CoinInterface} from "../index";
+import {CoinInterface} from "../";
 import {BIPGenericCoin} from "../BIPGenericCoin";
-import {Ethereum} from "../Defined/index";
+import {Ethereum} from "../Defined";
 import * as Builder from "./Builder";
 
 import {Transaction} from './Transaction';

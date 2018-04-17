@@ -1,10 +1,10 @@
 import * as BitcoinJS from 'bitcoinjs-lib';
 import BigNumber from "bignumber.js";
-import * as Coin from "../index";
+import * as Coin from "../";
 import * as Utils from "../../Utils";
 import * as Constants from "../../Constants";
 import {BIPGenericCoin} from "../BIPGenericCoin";
-import * as Transaction from "./index";
+import * as Transaction from "./";
 import * as Key from "../Key";
 
 const EthereumTx = require('ethereumjs-tx');

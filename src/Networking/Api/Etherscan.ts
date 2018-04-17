@@ -1,5 +1,5 @@
 import BigNumber from "bignumber.js";
-import {Coin, Constants, Wallet} from "../../index";
+import {Coin, Constants, Wallet} from "../../";
 
 interface Transaction {
     hash: string;

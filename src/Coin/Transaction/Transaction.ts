@@ -1,4 +1,4 @@
-import {TransactionScheme} from "../index";
+import {TransactionScheme} from "../";
 
 export interface Transaction {
     id: string;

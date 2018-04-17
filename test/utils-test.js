@@ -58,6 +58,24 @@ const testUtilsMethods = () => {
             done();
         });
     });
+
+    describe('Method isHexValid', () => {
+        it('Empty', (done, reject) => {
+            if (false === Utils.isHexValid('', null, 0)) {
+                throw new Error('Empty HEX - is a HEX too');
+            }
+
+            done();
+        });
+
+        it('Only 0x prefix', (done, reject) => {
+            if (false === Utils.isHexValid('0x', null, 1)) {
+                throw new Error('Prefix 0x is a HEX, but empty HEX');
+            }
+
+            done();
+        });
+    });
 };
 
 describe('Utils tests', testUtilsMethods);

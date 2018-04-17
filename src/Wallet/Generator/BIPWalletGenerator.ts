@@ -2,7 +2,7 @@ import {WDGenerator} from "./WDGenerator";
 import {times} from 'lodash';
 import Bottleneck from "bottleneck";
 import * as Coin from "../../Coin";
-import * as Wallet from "../index";
+import * as Wallet from "../";
 import * as HD from "../../HD";
 import * as Constants from "../../Constants";
 

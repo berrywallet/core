@@ -2,7 +2,6 @@ import BigNumber from "bignumber.js";
 import {Dictionary, List} from 'lodash';
 import {Coin, HD} from "../../";
 
-
 interface Block {
     hash: string;
     height: number;
@@ -20,8 +19,8 @@ interface WalletAddress {
 
 
 interface WalletTransaction {
-    coin: Coin.Unit;
     txid: string;
+    coin: Coin.Unit;
     blockHash?: string;
     blockHeight?: number;
     blockTime?: number;         // Unix Timestamp
@@ -40,9 +39,9 @@ interface BIPInput {
 
 interface BIPOutput {
     value: string;
-    addresses: string[];    // @TODO Need find why there is used an Array instead of primitive
     scriptPubKey: string;
-    scriptType: string;     // @TODO Need declare specific script types
+    addresses?: string[];    // @TODO Need find why there is used an Array instead of primitive
+    scriptType?: string;     // @TODO Need declare specific script types
 }
 
 

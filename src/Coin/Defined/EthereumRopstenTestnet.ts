@@ -1,4 +1,4 @@
-import * as Coin from "../index";
+import * as Coin from "../";
 import Ethereum from './Ethereum';
 import * as Constants from "../../Constants";
 import BigNumber from "bignumber.js";

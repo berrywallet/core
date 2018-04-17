@@ -1,7 +1,7 @@
 import {each, orderBy} from 'lodash';
 import {Coin, Constants, Wallet} from "../../";
 import BigNumber from "bignumber.js";
-import {Insight} from "./index";
+import {Insight} from "./";
 
 interface Network {
     info: {

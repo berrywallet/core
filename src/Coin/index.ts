@@ -5,7 +5,7 @@ import * as Options from "./Options"
 import * as Helper from "./Helper";
 import {FeeTypes} from "./Fee";
 import {BIPGenericCoin} from "./BIPGenericCoin"
-import * as Transaction from "./Transaction/index"
+import * as Transaction from "./Transaction"
 import BigNumber from "bignumber.js";
 
 enum BalanceScheme {

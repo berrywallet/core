@@ -1,4 +1,4 @@
-import * as Key from "./index";
+import * as Key from "./";
 import * as EthereumJsUtil from "ethereumjs-util";
 import * as Utils from "../../Utils";
 
