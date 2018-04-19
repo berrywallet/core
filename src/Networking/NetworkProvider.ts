@@ -1,5 +1,5 @@
 import {filter, each} from 'lodash';
-import {Coin, Wallet, Utils} from "../";
+import {Coin, Wallet, Utils, Debug} from "../";
 import * as Networking from "./";
 import {Destructable} from "../Utils/Destructable";
 
@@ -35,11 +35,14 @@ class NetworkProvider implements NetworkProviderInterface {
 
     protected clientList: ClientUnit[] = [];
     protected currentClientIndex = 0;
+    protected debug: Debug.BerryDebug;
 
     /**
      * @param {CoinInterface} coin
      */
     constructor(protected readonly coin: Coin.CoinInterface) {
+
+        this.debug = Debug.create('NetworkProvider:' + this.coin.getUnit());
 
         const clientOptions = Networking.Adapter.getNetworkAdapters(coin);
 
@@ -86,47 +89,32 @@ class NetworkProvider implements NetworkProviderInterface {
      * @returns {Promise<WalletTransaction[]>}
      * @TODO Need add normal client observer
      */
-    getAddressTxs(address: string): Promise<Wallet.Entity.WalletTransaction[]> {
+    public getAddressTxs(address: string): Promise<Wallet.Entity.WalletTransaction[]> {
         const client = this.getClient(0);
 
         return client
             .getAddressTxs(address)
-            .catch((error) => {
-                console.error(error.message);
-                console.log(typeof client, client.getOptions());
-
-                throw error;
-            });
+            .catch(this.catchError('getAddressTxs', client));
     }
 
-    getBulkAddrTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
+    /**
+     * @param {string[]} addrs
+     * @returns {Promise<WalletTransaction[]>}
+     */
+    public getBulkAddrTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
         const client = this.getClient(0);
 
-        return client
-            .getBulkAddrsTxs(addrs)
-            .catch((error) => {
-                console.error(error.message);
-                console.log(typeof client, client.getOptions());
-
-                throw error;
-            });
+        return client.getBulkAddrsTxs(addrs).catch(this.catchError('getBulkAddrTxs', client));
     }
 
     /**
      * @param {string} txid
      * @returns {Promise<WalletTransaction>}
      */
-    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null> {
+    public getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null> {
         const client = this.getClient(0); // this.rotateClient(0);
 
-        return client
-            .getTx(txid)
-            .catch((error) => {
-                console.error(error.message);
-                console.log(typeof client, client.getOptions());
-
-                throw error;
-            });
+        return client.getTx(txid).catch(this.catchError('getTx', client));
     }
 
     /**
@@ -180,11 +168,24 @@ class NetworkProvider implements NetworkProviderInterface {
             if (this.clientList[i].client) {
                 this.clientList[i].client.destruct();
             }
-            
+
             delete this.clientList[i];
         }
 
         this.clientList = [];
+    }
+
+    /**
+     * @param {string} method
+     * @param client
+     * @returns {(error: Error) => void}
+     */
+    protected catchError = (method: string, client) => {
+        return (error: Error) => {
+            this.debug(`ERROR in ${method}`, error.message, typeof client, client.getOptions());
+
+            throw error;
+        }
     }
 }
 

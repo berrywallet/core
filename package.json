@@ -1,10 +1,11 @@
 {
     "name": "@berrywallet/core",
-    "version": "0.2.7",
+    "version": "0.2.8",
     "description": "",
     "scripts": {
-        "build": "rm -rf ./dist && tsc",
-        "test": "mocha -t 20000"
+        "build": "rm -rf ./dist && $(npm bin)/tsc",
+        "test": "mocha -t 20000",
+        "coverage": "$(npm bin)/istanbul cover node_modules/mocha/bin/_mocha -- --bail --timeout 200 --slow 99999 -R dot"
     },
     "author": "Berrywallet <berry@berrywallet.com>",
     "main": "./dist/index.js",
@@ -24,7 +25,6 @@
         "ethereumjs-util": "^5.1.2",
         "etherscan-api": "^6.0.2",
         "lodash": "^4.17.4",
-        "mocha": "^5.0.1",
         "queue": "^4.4.2",
         "socket.io-client": "^2.0.4",
         "wif": "^2.0.6"
@@ -36,7 +36,9 @@
         "@types/socket.io": "^1.4.31",
         "@types/socket.io-client": "^1.4.32",
         "@warren-bank/ethereumjs-tx-sign": "^2.0.0",
+        "istanbul": "^0.4.5",
         "jshint": "^2.9.5",
+        "mocha": "^5.0.1",
         "types-ethereumjs-util": "0.0.5",
         "typescript": "2.7.2"
     }

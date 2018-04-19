@@ -1,8 +1,7 @@
 import {map, find} from 'lodash';
-import createDebugger from 'debug';
 import {EventEmitter} from 'events';
 
-import {Wallet} from '../../../';
+import {Wallet, Debug} from '../../../';
 import {Destructable} from "../../../Utils/Destructable";
 import {Events} from "../../"
 import {INetworkClient} from "../";
@@ -48,14 +47,14 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
 
     constructor(protected readonly networkClient: T) {
         super();
-        this.debug = createDebugger('TrackerClient::' + this.networkClient.getCoin().getUnit().toString());
+        this.debug = Debug.create('TRACKER_CLIENT::' + this.networkClient.getCoin().getUnit().toString());
     }
 
     /**
      * @param callback
      * @returns {ITrackerClient}
      */
-    onConnect(callback): ITrackerClient {
+    public onConnect(callback): ITrackerClient {
         this.on(TrackerEvent.Connect, callback);
 
         return this;
@@ -65,7 +64,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
      * @param callback
      * @returns {ITrackerClient}
      */
-    onDisconnect(callback): ITrackerClient {
+    public onDisconnect(callback): ITrackerClient {
         this.on(TrackerEvent.Disconnect, callback);
 
         return this;
@@ -76,7 +75,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
      *
      * @returns {ITrackerClient}
      */
-    onConnectionError(callback): ITrackerClient {
+    public onConnectionError(callback): ITrackerClient {
         this.on(TrackerEvent.ConnectionError, callback);
 
         return this;
@@ -86,7 +85,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
      * @param {NewBlockCallback} callback
      * @returns {ITrackerClient}
      */
-    onBlock(callback: Events.NewBlockCallback): ITrackerClient {
+    public onBlock(callback: Events.NewBlockCallback): ITrackerClient {
         this.on(TrackerEvent.Block, callback);
 
         return this;
@@ -98,7 +97,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
      *
      * @returns {ITrackerClient}
      */
-    onTransactionConfirm(txid: string, callback: Events.NewTxCallback): ITrackerClient {
+    public onTransactionConfirm(txid: string, callback: Events.NewTxCallback): ITrackerClient {
         this.once(`tx.${txid}`, callback);
 
         return this;
@@ -108,7 +107,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
      * @param {string[]} addrs
      * @param {NewTxCallback} callback
      */
-    onAddrsTx(addrs: string[], callback: Events.NewTxCallback): ITrackerClient {
+    public onAddrsTx(addrs: string[], callback: Events.NewTxCallback): ITrackerClient {
         const coinKeyFormatter = this.networkClient.getCoin().getKeyFormat();
 
         const addrBuffers: Buffer[] = map(addrs, (addr: string) => {
@@ -127,7 +126,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
      * @param {string} address
      * @returns {boolean}
      */
-    isAddrTrack(address: string | Buffer): boolean {
+    public isAddrTrack(address: string | Buffer): boolean {
         if (!address) {
             // For the case, when no FROM or TO in transaction
             return false;
@@ -193,7 +192,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
         return this.emit(`tx.${tx.txid}`, tx);
     }
 
-    destruct() {
+    public destruct() {
         this.addrTxEvents = {addrs: [], callback: null};
         this.removeAllListeners('tx.*');
         this.removeAllListeners('addr.*')

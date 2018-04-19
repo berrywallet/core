@@ -2,7 +2,7 @@ import * as Crypto from "./Crypto";
 import BigNumber from "bignumber.js";
 import * as EthereumJsUtil from "ethereumjs-util";
 
-function isHexPrefixed(hex: string): boolean {
+export function isHexPrefixed(hex: string): boolean {
     return hex.slice(0, 2) === '0x';
 }
 
@@ -13,7 +13,7 @@ function isHexPrefixed(hex: string): boolean {
  * @param {number} prefix 0 - no prefix, 1 - required prefix, 2 - optional
  * @returns {boolean}
  */
-function isHexValid(hex: string, length: number = null, prefix: number = 0): boolean {
+export function isHexValid(hex: string, length: number = null, prefix: number = 0): boolean {
 
     if (!/^(0x)?([0-9a-fA-F]+)?$/i.test(hex)) {
         return false;
@@ -44,20 +44,20 @@ function isHexValid(hex: string, length: number = null, prefix: number = 0): boo
 }
 
 
-function addHexPrefix(hex: string|Buffer): string {
-    if(hex instanceof Buffer) {
+export function addHexPrefix(hex: string | Buffer): string {
+    if (hex instanceof Buffer) {
         hex = hex.toString('hex');
     }
 
     return EthereumJsUtil.addHexPrefix(hex);
 }
 
-function padHexToEven(a: string): string {
+export function padHexToEven(a: string): string {
     if (a.length % 2) a = '0' + a;
     return a;
 }
 
-function hexToBuffer(hex: string): Buffer {
+export function hexToBuffer(hex: string): Buffer {
     if (!isHexValid(hex, null, 2)) {
         throw new TypeError(`Invalid hex string ${hex}`);
     }
@@ -69,7 +69,7 @@ function hexToBuffer(hex: string): Buffer {
     return Buffer.from(hex.toLowerCase(), 'hex');
 }
 
-function validateAmountValue(value: BigNumber, minValue: BigNumber, allowZero: boolean = true) {
+export function validateAmountValue(value: BigNumber, minValue: BigNumber, allowZero: boolean = true) {
     if (value.isNegative()) {
         throw new RangeError("Value cannot be negative");
     }
@@ -83,7 +83,7 @@ function validateAmountValue(value: BigNumber, minValue: BigNumber, allowZero: b
 }
 
 
-function bigNumberToBuffer(value: BigNumber): Buffer {
+export function bigNumberToBuffer(value: BigNumber): Buffer {
     if (!value.isInt()) {
         throw new Error("Value must be integer")
     }
@@ -91,38 +91,23 @@ function bigNumberToBuffer(value: BigNumber): Buffer {
     return hexToBuffer(padHexToEven(value.toString(16)));
 }
 
-function bufferToBigNumber(buffer: Buffer): BigNumber {
+export function bufferToBigNumber(buffer: Buffer): BigNumber {
     return new BigNumber(buffer.toString('hex'), 16);
 }
 
 /**
- * @param {number | BigNumber} number 
+ * @param {number | BigNumber} number
  */
-function numberToHex(number: number | BigNumber): string {
+export function numberToHex(number: number | BigNumber): string {
     return "0x" + (new BigNumber(number).toString(16));
 }
 
 /**
- * @param hexNumber 
+ * @param hexNumber
  */
-function hexToBigNumber(hexNumber: string): BigNumber {
+export function hexToBigNumber(hexNumber: string): BigNumber {
     return new BigNumber(hexNumber);
 }
 
 
-export {
-    Crypto,
-
-    isHexPrefixed,
-    isHexValid,
-    addHexPrefix,
-
-    hexToBuffer,
-    numberToHex,
-    hexToBigNumber,
-
-    validateAmountValue,
-
-    bigNumberToBuffer,
-    bufferToBigNumber
-};
+export {Crypto}

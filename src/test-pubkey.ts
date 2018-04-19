@@ -1,11 +1,10 @@
 import {each} from 'lodash';
 import {Events} from "./Networking";
 import InfuraNetworkClient from "./Networking/Clients/InfuraNetworkClient";
-import {Coin, Networking, Wallet} from './';
-import debuger from 'debug';
+import {Coin, Networking, Wallet, Debug} from './';
 const BIP39 = require('bip39');
 
-const debug = debuger('berrywallet:test-pubkey');
+const debug = Debug.create('test-pubkey');
 
 const coin = Coin.makeCoin(Coin.Unit.LTCt);
 const networkProvider = new Networking.NetworkProvider(coin);
