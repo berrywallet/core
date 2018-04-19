@@ -2,7 +2,7 @@ import {each, map} from 'lodash';
 import BigNumber from "bignumber.js";
 import * as BitcoinJS from "bitcoinjs-lib";
 
-import {Coin, Utils} from '../';
+import {Coin, Constants} from '../';
 import {Provider, Entity, Exceptions} from './';
 
 
@@ -127,7 +127,7 @@ function mapBIPTransaction(walletTransaction: Entity.BIPTransaction,
         const address = BitcoinJS.address.fromOutputScript(output.script, coin.networkInfo);
 
         return {
-            value: output.value.toFixed(),
+            value: new BigNumber(output.value).div(Constants.SATOSHI_PER_COIN).toFixed(),
             scriptPubKey: output.script.toString('hex'),
             addresses: [address],
             scriptType: null

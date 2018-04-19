@@ -1,27 +1,20 @@
 import {WDGenerator} from "./WDGenerator";
 import {times} from 'lodash';
 import Bottleneck from "bottleneck";
-import * as Coin from "../../Coin";
-import * as Wallet from "../";
-import * as HD from "../../HD";
-import * as Constants from "../../Constants";
+import {Coin, Wallet, HD, Constants} from '../../';
 
 export class BIPWalletGenerator extends WDGenerator {
 
     protected readonly limiter: Bottleneck;
 
-    constructor(coin: Coin.CoinInterface, seed: Buffer) {
+    public constructor(coin: Coin.CoinInterface, seed: Buffer) {
         super(coin, seed);
 
         this.limiter = new Bottleneck(1, 100);
     }
 
-    /**
-     * @param addressCount
-     * @param {AddressType} addressType
-     */
-    deriveAddresses(addressCount: number,
-                    addressType: HD.BIP44.AddressType): Promise<string[]> {
+    public deriveAddresses(addressCount: number,
+                           addressType: HD.BIP44.AddressType): Promise<string[]> {
 
         const privateProvider = this.wdProvider.getPrivate(this.seed);
         const addrsPromises: Promise<string>[] = [];
@@ -37,7 +30,7 @@ export class BIPWalletGenerator extends WDGenerator {
         return Promise.all(addrsPromises)
     }
 
-    extractAddrsTxs(addrs: string[]): Promise<any> {
+    public extractAddrsTxs(addrs: string[]): Promise<any> {
         const networkProvider = this.wdProvider.getNetworkProvider();
 
         return networkProvider
@@ -49,12 +42,7 @@ export class BIPWalletGenerator extends WDGenerator {
             });
     }
 
-    /**
-     * @param {AddressType} addressType
-     *
-     * @returns {Promise<boolean>}
-     */
-    bulkAddrGenerate(addressType: HD.BIP44.AddressType): Promise<boolean> {
+    public bulkAddrGenerate(addressType: HD.BIP44.AddressType): Promise<boolean> {
         const onAddressGenerated = (addrs: string[]) => {
             return this.extractAddrsTxs(addrs).then(() => {
 
@@ -72,21 +60,15 @@ export class BIPWalletGenerator extends WDGenerator {
             .then(onAddressGenerated);
     }
 
-
-    /**
-     * @returns {Promise<WDProvider>}
-     */
-    fill(): Promise<Wallet.Provider.WDProvider> {
-        return new Promise<Wallet.Provider.WDProvider>((resolve, reject) => {
-
-            const addressGenerators = [
+    public fill(): Promise<Wallet.Provider.WDProvider> {
+        return Promise
+            .all([
                 this.bulkAddrGenerate(HD.BIP44.AddressType.RECEIVE),
                 this.bulkAddrGenerate(HD.BIP44.AddressType.CHANGE)
-            ];
-
-            Promise.all(addressGenerators).then(() => {
-                resolve(this.wdProvider);
+            ])
+            .then(() => this.wdProvider)
+            .catch((error: Error) => {
+                throw error;
             });
-        });
     }
 }

@@ -1,7 +1,6 @@
 import {each, reduce, find} from 'lodash';
-import debugCreator from 'debug';
 import {parse as urlParcer} from "url";
-import {Wallet} from '../../../';
+import {Wallet, Debug} from '../../../';
 import {InsightNetworkClient} from '../';
 import {TrackerClient} from './';
 
@@ -23,7 +22,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
         this.connected = false;
 
         const wsUrl = urlParcer(this.networkClient.getWSUrl());
-        this.debug = debugCreator("berrywallet:SOCKET:" + wsUrl.host);
+        this.debug = Debug.create("SOCKET:" + wsUrl.host);
 
         setTimeout(() => {
             this.createSocketConnection();
