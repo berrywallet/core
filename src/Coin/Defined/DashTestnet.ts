@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 
 export default class DashTestnet extends BIPGenericCoin {
 
-    get isSegWitAvailable(): boolean {
+    isSegWitAvailable(): boolean {
         return false;
     }
 
@@ -21,7 +21,7 @@ export default class DashTestnet extends BIPGenericCoin {
         return 5;
     }
 
-    get networkInfo(): Network {
+    networkInfo(): Network {
         return {
             bip32: {
                 "public": 0x043587cf,

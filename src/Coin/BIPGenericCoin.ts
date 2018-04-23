@@ -29,11 +29,11 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
             options = new Coin.Options.BIPCoinOptions();
         }
 
-        if (!this.isSegWitAvailable) {
+        if (!this.isSegWitAvailable()) {
             options.useSegWit = false;
         }
 
-        this.hdKeyFormat = new Coin.Key.BIPKeyFormat(this.networkInfo, options);
+        this.hdKeyFormat = new Coin.Key.BIPKeyFormat(this.networkInfo(), options);
     }
 
     getKeyFormat(): Coin.Key.FormatInterface {
@@ -62,9 +62,9 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
 
     abstract getHDCoinType(): number;
 
-    abstract get networkInfo(): Network;
+    abstract networkInfo(): Network;
 
-    abstract get isSegWitAvailable(): boolean;
+    abstract isSegWitAvailable(): boolean;
 
     abstract get defaultFeePerByte(): BigNumber;
 

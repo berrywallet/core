@@ -4,7 +4,7 @@ import InsightNetworkClient from "./InsightNetworkClient";
 import InfuraNetworkClient from "./InfuraNetworkClient";
 import EtherscanNetworkClient from "./EtherscanNetworkClient";
 import BlockcypherBIPNetworkClient from "./BlockcypherBIPNetworkClient";
-import Tracker from './Tracker';
+import * as Tracker from './Tracker';
 
 export {
     INetworkClient,

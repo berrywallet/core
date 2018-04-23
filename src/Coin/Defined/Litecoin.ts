@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 
 export default class Litecoin extends BIPGenericCoin {
 
-    get isSegWitAvailable(): boolean {
+    isSegWitAvailable(): boolean {
         return true;
     }
 
@@ -21,7 +21,7 @@ export default class Litecoin extends BIPGenericCoin {
         return 2;
     }
 
-    get networkInfo(): Network {
+    networkInfo(): Network {
         return {
             bip32: {
                 "public": 0x019da462,

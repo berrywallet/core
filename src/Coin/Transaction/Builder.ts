@@ -31,7 +31,7 @@ export class BIPTransactionBuilder implements TransactionBuilder {
         }
 
         this.coin = coin as BIPGenericCoin;
-        this.network = this.coin.networkInfo;
+        this.network = this.coin.networkInfo();
         this.reset();
     }
 
