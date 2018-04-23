@@ -5,7 +5,7 @@ import BigNumber from "bignumber.js";
 
 export default class BitcoinTestnet extends BIPGenericCoin {
 
-    get isSegWitAvailable() {
+    isSegWitAvailable() {
         return true;
     }
 
@@ -21,7 +21,7 @@ export default class BitcoinTestnet extends BIPGenericCoin {
         return 1;
     }
 
-    get networkInfo(): Network {
+    networkInfo(): Network {
         return {
             bip32: {
                 "public": 0x043587cf,

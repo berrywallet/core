@@ -124,7 +124,7 @@ function mapBIPTransaction(walletTransaction: Entity.BIPTransaction,
     });
 
     walletTransaction.outputs = map(coinTx.outputs, (output: BitcoinJS.Out) => {
-        const address = BitcoinJS.address.fromOutputScript(output.script, coin.networkInfo);
+        const address = BitcoinJS.address.fromOutputScript(output.script, coin.networkInfo());
 
         return {
             value: new BigNumber(output.value).div(Constants.SATOSHI_PER_COIN).toFixed(),

@@ -28,6 +28,9 @@ Icon
 .com.apple.timemachine.donotpresent
 publish.sh
 
+# Some CI systems
+.travis.yml
+
 # Directories potentially created on remote AFP share
 .AppleDB
 .AppleDesktop
