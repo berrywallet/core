@@ -1,10 +1,10 @@
-import {Coin} from '../';
+import { Coin } from '../';
 
 import * as Adapter from './Adapter';
 import * as Api from './Api';
 import * as Events from './Events';
 import * as Clients from "./Clients";
-import {NetworkProvider} from "./NetworkProvider";
+import { NetworkProvider } from "./NetworkProvider";
 
 /**
  * @param {CoinInterface} coin
@@ -32,7 +32,7 @@ function createClient(coin: Coin.CoinInterface, props: Api.AdapterPropsInterface
             throw new Error('You have to implement BLOCKCYPHER_ETHER');
     }
 
-    throw new Error(`Adapter Type ${props.type} has not implemented`)
+    throw new Error(`Adapter Type ${props.type} has not implemented`);
 }
 
 /**
@@ -53,5 +53,5 @@ export {
     NetworkProvider,
 
     createClient,
-    firstNetworkClient
-}
+    firstNetworkClient,
+};

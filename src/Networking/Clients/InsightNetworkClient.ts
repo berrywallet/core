@@ -1,4 +1,4 @@
-import BigNumber from "bignumber.js";
+import BigNumber from 'bignumber.js';
 import Bottleneck from 'bottleneck';
 import { each, orderBy, Dictionary } from 'lodash';
 import Axios, { AxiosInstance, AxiosResponse } from "axios";

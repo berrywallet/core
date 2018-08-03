@@ -1,15 +1,14 @@
-import {filter, each} from 'lodash';
-import {Coin, Wallet, Utils, Debug} from "../";
-import * as Networking from "./";
-import {Destructable} from "../Utils/Destructable";
+import { filter, each } from 'lodash';
 
+import { Coin, Wallet, Utils, Debug } from '../';
+import * as Networking from './';
+import { Destructable } from '../Utils/Destructable';
 
 interface ClientUnit {
     options: Networking.Api.AdapterOptionInterface;
     client: Networking.Clients.INetworkClient;
     banned: boolean;
 }
-
 
 interface NetworkProviderInterface extends Destructable {
 
@@ -37,10 +36,7 @@ class NetworkProvider implements NetworkProviderInterface {
     protected currentClientIndex = 0;
     protected debug: Debug.BerryDebug;
 
-    /**
-     * @param {CoinInterface} coin
-     */
-    constructor(protected readonly coin: Coin.CoinInterface) {
+    public constructor(protected readonly coin: Coin.CoinInterface) {
 
         this.debug = Debug.create('NetworkProvider:' + this.coin.getUnit());
 
@@ -55,22 +51,15 @@ class NetworkProvider implements NetworkProviderInterface {
             this.clientList.push({
                 client: client,
                 banned: false,
-                options: props.options
+                options: props.options,
             } as ClientUnit);
         });
     }
 
-    /**
-     * @returns {number}
-     */
     protected getClientCount(): number {
         return this.clientList.length;
     }
 
-    /**
-     * @param {number} depth
-     * @returns {INetworkClient}
-     */
     protected rotateClient(depth: number = 0): Networking.Clients.INetworkClient {
         if (depth > 0 && depth > this.getClientCount()) {
             throw new Error('All clients are wrong..!');
@@ -85,8 +74,6 @@ class NetworkProvider implements NetworkProviderInterface {
     }
 
     /**
-     * @param {string} address
-     * @returns {Promise<WalletTransaction[]>}
      * @TODO Need add normal client observer
      */
     public getAddressTxs(address: string): Promise<Wallet.Entity.WalletTransaction[]> {
@@ -97,73 +84,43 @@ class NetworkProvider implements NetworkProviderInterface {
             .catch(this.catchError('getAddressTxs', client));
     }
 
-    /**
-     * @param {string[]} addrs
-     * @returns {Promise<WalletTransaction[]>}
-     */
     public getBulkAddrTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
         const client = this.getClient(0);
 
         return client.getBulkAddrsTxs(addrs).catch(this.catchError('getBulkAddrTxs', client));
     }
 
-    /**
-     * @param {string} txid
-     * @returns {Promise<WalletTransaction>}
-     */
     public getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | undefined> {
         const client = this.getClient(0);
 
         return client.getTx(txid).catch(this.catchError('getTx', client));
     }
 
-    /**
-     * @returns {ITrackerClient}
-     */
-    getTracker(): Networking.Clients.Tracker.ITrackerClient {
+    public getTracker(): Networking.Clients.Tracker.ITrackerClient {
         return this.clientList[0].client.getTracker();
     }
 
-    /**
-     * @param {NewBlockCallback} callback
-     */
-    onNewBlock(callback: Networking.Events.NewBlockCallback): void {
+    public onNewBlock(callback: Networking.Events.NewBlockCallback): void {
         this.getTracker().onBlock(callback);
     }
 
-    /**
-     * @param {string} txid
-     * @param {NewTxCallback} callback
-     */
-    onTransactionConfirm(txid: string, callback: Networking.Events.NewTxCallback) {
+    public onTransactionConfirm(txid: string, callback: Networking.Events.NewTxCallback) {
         this.getTracker().onTransactionConfirm(txid, callback);
     }
 
-    /**
-     * @param {string[]} addrs
-     * @param {NewTxCallback} callback
-     */
-    onAddrsTx(addrs: string[], callback: Networking.Events.NewTxCallback): void {
+    public onAddrsTx(addrs: string[], callback: Networking.Events.NewTxCallback): void {
         this.getTracker().onAddrsTx(addrs, callback);
     }
 
-    /**
-     * @param {number} index
-     * @returns {INetworkClient}
-     */
-    getClient(index: number = 0): Networking.Clients.INetworkClient {
+    public getClient(index: number = 0): Networking.Clients.INetworkClient {
         return this.clientList[index].client;
     }
 
-    /**
-     * @param {Transaction} transaction
-     * @returns {Promise<string>} transaction TXID transaction
-     */
-    broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
+    public broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
         return this.getClient(0).broadCastTransaction(transaction);
     }
 
-    destruct() {
+    public destruct() {
         for (let i in this.clientList) {
             if (this.clientList[i].client) {
                 this.clientList[i].client.destruct();
@@ -175,23 +132,18 @@ class NetworkProvider implements NetworkProviderInterface {
         this.clientList = [];
     }
 
-    /**
-     * @param {string} method
-     * @param client
-     * @returns {(error: Error) => void}
-     */
     protected catchError = (method: string, client) => {
         return (error: Error) => {
             this.debug(`ERROR in ${method}`, error.message, typeof client, client.getOptions());
 
             throw error;
-        }
-    }
+        };
+    };
 }
 
 
 export {
     ClientUnit,
     NetworkProviderInterface,
-    NetworkProvider
-}
+    NetworkProvider,
+};

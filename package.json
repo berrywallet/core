@@ -1,7 +1,12 @@
 {
     "name": "@berrywallet/core",
-    "version": "0.3.1",
-    "description": "",
+    "version": "0.3.1-alpha.01",
+    "description": "Berrywallet main Core for work with common cryptocurrencies like Bitcoin, Ethereum, Dash, Litecoin",
+    "repository": "https://github.com/berrywallet/core",
+    "author": "Berrywallet <berry@berrywallet.com>",
+    "main": "./dist/index.js",
+    "typings": "dist/index",
+    "license": "LGPL-3.0",
     "scripts": {
         "build": "rm -rf ./dist && $(npm bin)/tsc",
         "test": "mocha -t 20000",
@@ -9,11 +14,6 @@
         "tag:patch": "yarn version --new-version patch",
         "tag:minor": "yarn version --new-version minor"
     },
-    "author": "Berrywallet <berry@berrywallet.com>",
-    "main": "./dist/index.js",
-    "typings": "dist/index",
-    "license": "LGPL-3.0",
-    "repository": "https://github.com/berrywallet/core",
     "dependencies": {
         "axios": "^0.17.1",
         "bignumber.js": "^5.0.0",
