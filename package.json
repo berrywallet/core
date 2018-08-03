@@ -1,11 +1,13 @@
 {
     "name": "@berrywallet/core",
-    "version": "0.3.0",
+    "version": "0.4.0",
     "description": "",
     "scripts": {
         "build": "rm -rf ./dist && $(npm bin)/tsc",
         "test": "mocha -t 20000",
-        "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --bail -t 20000 --slow 99999 -R dot"
+        "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --bail -t 20000 --slow 99999 -R dot",
+        "tag:patch": "yarn version --new-version patch",
+        "tag:minor": "yarn version --new-version minor"
     },
     "author": "Berrywallet <berry@berrywallet.com>",
     "main": "./dist/index.js",
