@@ -4,8 +4,8 @@
     "description": "",
     "scripts": {
         "build": "rm -rf ./dist && $(npm bin)/tsc",
-        "test": "$(npm bin)mocha -t 20000",
-        "coverage": "$(npm bin)/istanbul cover node_modules/mocha/bin/_mocha -- --bail -t 20000 --slow 99999 -R dot"
+        "test": "mocha -t 20000",
+        "coverage": "istanbul cover node_modules/mocha/bin/_mocha -- --bail -t 20000 --slow 99999 -R dot"
     },
     "author": "Berrywallet <berry@berrywallet.com>",
     "main": "./dist/index.js",
