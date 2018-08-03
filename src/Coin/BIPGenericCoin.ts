@@ -1,20 +1,19 @@
 import * as Coin from "./";
-import {Network} from "bitcoinjs-lib";
-import {SATOSHI_PER_COIN} from "../Constants"
+import { Network } from "bitcoinjs-lib";
+import { SATOSHI_PER_COIN } from "../Constants";
 import BigNumber from "bignumber.js";
 
 export abstract class BIPGenericCoin implements Coin.CoinInterface {
-
     getOptions(): Coin.Options.BIPCoinOptions {
         return this.options;
     }
 
     getBalanceScheme(): Coin.BalanceScheme {
-        return Coin.BalanceScheme.UTXO
+        return Coin.BalanceScheme.UTXO;
     }
 
     getTransactionScheme(): Coin.TransactionScheme {
-        return Coin.TransactionScheme.INPUTS_OUTPUTS
+        return Coin.TransactionScheme.INPUTS_OUTPUTS;
     }
 
     isMultiAddressAccount(): boolean {

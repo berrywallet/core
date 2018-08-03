@@ -17,6 +17,7 @@
         "bignumber.js": "^5.0.0",
         "bip39": "^2.4.0",
         "bitcoinjs-lib": "^3.2.0",
+        "bluebird": "^3.5.1",
         "bottleneck": "1.16.0",
         "coinselect": "^3.1.11",
         "create-hash": "^1.1.0",
@@ -30,8 +31,10 @@
         "wif": "^2.0.6"
     },
     "devDependencies": {
-        "@types/bignum": "0.0.29",
+        "@types/axios": "^0.14.0",
+        "@types/bip39": "^2.4.0",
         "@types/bitcoinjs-lib": "^3.0.5",
+        "@types/bluebird": "^3.5.23",
         "@types/lodash": "^4.14.100",
         "@types/socket.io": "^1.4.31",
         "@types/socket.io-client": "^1.4.32",
