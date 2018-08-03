@@ -1,10 +1,9 @@
-import {map, find} from 'lodash';
-import {EventEmitter} from 'events';
-
-import {Wallet, Debug} from '../../../';
-import {Destructable} from "../../../Utils/Destructable";
-import {Events} from "../../"
-import {INetworkClient} from "../";
+import { map, find } from 'lodash';
+import { EventEmitter } from 'events';
+import { Wallet, Debug } from '../../../';
+import { Destructable } from '../../../Utils/Destructable';
+import { Events } from "../../";
+import { INetworkClient } from "../";
 
 enum TrackerEvent {
     Connect = 'connect',
@@ -38,15 +37,17 @@ interface IAddressTrackEvent {
 
 
 class TrackerClient<T extends INetworkClient> extends EventEmitter implements ITrackerClient {
+    protected debug;
+    protected readonly networkClient: T;
     protected addrTxEvents: IAddressTrackEvent = {
         addrs: [],
-        callback: null
+        callback: undefined,
     };
 
-    protected debug;
-
-    constructor(protected readonly networkClient: T) {
+    public constructor(networkClient: T) {
         super();
+
+        this.networkClient = networkClient;
         this.debug = Debug.create('TRACKER_CLIENT::' + this.networkClient.getCoin().getUnit().toString());
     }
 
@@ -111,12 +112,12 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
         const coinKeyFormatter = this.networkClient.getCoin().getKeyFormat();
 
         const addrBuffers: Buffer[] = map(addrs, (addr: string) => {
-            return coinKeyFormatter.parseAddress(addr).toBuffer()
+            return coinKeyFormatter.parseAddress(addr).toBuffer();
         });
 
         this.addrTxEvents = {
             addrs: addrBuffers,
-            callback: callback
+            callback: callback,
         };
 
         return this;
@@ -146,7 +147,7 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
             }
         }
 
-        const {addrs = []} = this.addrTxEvents;
+        const { addrs = [] } = this.addrTxEvents;
 
         return !!find(addrs, (addr: Buffer) => {
             return buffer.equals(addr);
@@ -193,9 +194,10 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
     }
 
     public destruct() {
-        this.addrTxEvents = {addrs: [], callback: null};
+        this.addrTxEvents = { addrs: [], callback: undefined };
+
         this.removeAllListeners('tx.*');
-        this.removeAllListeners('addr.*')
+        this.removeAllListeners('addr.*');
     }
 }
 
@@ -203,5 +205,5 @@ export {
     TrackerEvent,
     IAddressTrackEvent,
     ITrackerClient,
-    TrackerClient
-}
+    TrackerClient,
+};

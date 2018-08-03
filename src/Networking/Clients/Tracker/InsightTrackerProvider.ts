@@ -1,8 +1,8 @@
-import {each, reduce, find} from 'lodash';
-import {parse as urlParcer} from "url";
-import {Wallet, Debug} from '../../../';
-import {InsightNetworkClient} from '../';
-import {TrackerClient} from './';
+import { each, reduce, find } from 'lodash';
+import { parse as urlParcer } from "url";
+import { Wallet, Debug } from '../../../';
+import { InsightNetworkClient } from '../';
+import { TrackerClient } from './';
 
 const io = require('socket.io-client');
 
@@ -29,13 +29,12 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
         }, 1);
     }
 
-    createSocketConnection() {
-
+    public createSocketConnection() {
         this.socket = io.connect(this.networkClient.getWSUrl(), {
             timeout: 1000,
             autoConnect: false,
             rejectUnauthorized: true,
-            transports: ['websocket']
+            transports: ['websocket'],
         });
 
         this.socket.on('connect', () => {
@@ -64,12 +63,12 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
 
         this.socket.on('block', (blockHash: string) => this.handleNewBlock(blockHash));
         this.socket.on('tx', (tx: any) => {
-            const {callback, addrs} = this.addrTxEvents;
+            const { callback, addrs } = this.addrTxEvents;
             if (callback && addrs.length) {
                 const transactionAddrs = reduce(
                     tx.vout,
                     (list, vout) => [...list, ...Object.keys(vout)],
-                    []
+                    [],
                 );
 
                 const addr = find(transactionAddrs, (addr) => this.isAddrTrack(addr));
@@ -101,7 +100,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
 
         setTimeout(() => {
             this.createSocketConnection();
-        }, 2000)
+        }, 2000);
     }
 
     protected fireConnect(): boolean {
@@ -124,7 +123,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
 
             this.networkClient
                 .getTx(txid)
-                .then(tx => {
+                .then((tx) => {
                     this.fireTxidConfirmation(tx);
                 });
         });
@@ -143,7 +142,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
         this.networkClient.getBlock(blockHash).then(onBlockGot);
     }
 
-    destruct() {
+    public destruct() {
         this.enableReconnect = false;
         this.connected = false;
 

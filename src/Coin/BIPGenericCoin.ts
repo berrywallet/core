@@ -1,32 +1,18 @@
-import * as Coin from "./";
-import { Network } from "bitcoinjs-lib";
-import { SATOSHI_PER_COIN } from "../Constants";
-import BigNumber from "bignumber.js";
+import BigNumber from 'bignumber.js';
+import { Network } from 'bitcoinjs-lib';
+import * as Coin from './';
+import { SATOSHI_PER_COIN } from '../Constants';
+
 
 export abstract class BIPGenericCoin implements Coin.CoinInterface {
-    getOptions(): Coin.Options.BIPCoinOptions {
-        return this.options;
-    }
+    protected options: Coin.Options.BIPCoinOptions;
 
-    getBalanceScheme(): Coin.BalanceScheme {
-        return Coin.BalanceScheme.UTXO;
-    }
-
-    getTransactionScheme(): Coin.TransactionScheme {
-        return Coin.TransactionScheme.INPUTS_OUTPUTS;
-    }
-
-    isMultiAddressAccount(): boolean {
-        return true;
-    }
-
-    private readonly hdKeyFormat: Coin.Key.FormatInterface;
-
-    constructor(protected options?: Coin.Options.BIPCoinOptions) {
-
+    public constructor(options?: Coin.Options.BIPCoinOptions) {
         if (!options) {
             options = new Coin.Options.BIPCoinOptions();
         }
+
+        this.options = options;
 
         if (!this.isSegWitAvailable()) {
             options.useSegWit = false;
@@ -35,37 +21,55 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
         this.hdKeyFormat = new Coin.Key.BIPKeyFormat(this.networkInfo(), options);
     }
 
-    getKeyFormat(): Coin.Key.FormatInterface {
+    public getOptions(): Coin.Options.BIPCoinOptions {
+        return this.options;
+    }
+
+    public getBalanceScheme(): Coin.BalanceScheme {
+        return Coin.BalanceScheme.UTXO;
+    }
+
+    public getTransactionScheme(): Coin.TransactionScheme {
+        return Coin.TransactionScheme.INPUTS_OUTPUTS;
+    }
+
+    public isMultiAddressAccount(): boolean {
+        return true;
+    }
+
+    public getKeyFormat(): Coin.Key.FormatInterface {
         return this.hdKeyFormat;
     }
 
-    makePrivateFromSeed(seed: Buffer): Coin.Private.BasicMasterNode {
+    public makePrivateFromSeed(seed: Buffer): Coin.Private.BasicMasterNode {
         return Coin.Private.BasicMasterNode.fromSeedBuffer(seed, this);
     }
 
-    get lowFeePerByte(): BigNumber {
+    public get lowFeePerByte(): BigNumber {
         return this.defaultFeePerByte.div(2);
     }
 
-    get highFeePerByte(): BigNumber {
+    public get highFeePerByte(): BigNumber {
         return this.defaultFeePerByte.mul(4);
     }
 
-    get minFeePerByte(): BigNumber {
+    public get minFeePerByte(): BigNumber {
         return new BigNumber(1).div(SATOSHI_PER_COIN);
     }
 
-    abstract getUnit(): Coin.Unit;
+    public abstract getUnit(): Coin.Unit;
 
-    abstract getName(): string;
+    public abstract getName(): string;
 
-    abstract getHDCoinType(): number;
+    public abstract getHDCoinType(): number;
 
-    abstract networkInfo(): Network;
+    public abstract networkInfo(): Network;
 
-    abstract isSegWitAvailable(): boolean;
+    public abstract isSegWitAvailable(): boolean;
 
-    abstract get defaultFeePerByte(): BigNumber;
+    public abstract get defaultFeePerByte(): BigNumber;
 
-    readonly minValue: BigNumber = new BigNumber(1).div(SATOSHI_PER_COIN);
+    public readonly minValue: BigNumber = new BigNumber(1).div(SATOSHI_PER_COIN);
+
+    private readonly hdKeyFormat: Coin.Key.FormatInterface;
 }

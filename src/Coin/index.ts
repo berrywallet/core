@@ -1,11 +1,11 @@
 import * as Key from "./Key";
-import * as Defined from "./Defined"
-import * as Private from "./Private"
-import * as Options from "./Options"
+import * as Defined from "./Defined";
+import * as Private from "./Private";
+import * as Options from "./Options";
 import * as Helper from "./Helper";
-import {FeeTypes} from "./Fee";
-import {BIPGenericCoin} from "./BIPGenericCoin"
-import * as Transaction from "./Transaction"
+import { FeeTypes } from "./Fee";
+import { BIPGenericCoin } from "./BIPGenericCoin";
+import * as Transaction from "./Transaction";
 import BigNumber from "bignumber.js";
 
 enum BalanceScheme {
@@ -104,5 +104,5 @@ export {
     CoinInterface,
 
     makeCoin,
-    makePrivateCoin
-}
+    makePrivateCoin,
+};

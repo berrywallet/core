@@ -16,5 +16,5 @@ export {
     Ethereum,
     EthereumRopstenTestnet,
     Litecoin,
-    LitecoinTestnet
-}
+    LitecoinTestnet,
+};

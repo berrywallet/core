@@ -1,17 +1,16 @@
-import {error} from "util";
+import { each, map } from 'lodash';
+import BigNumber from "bignumber.js";
+import Axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
+
+import { Coin, Wallet, Constants, Utils } from "../../";
+import { AdapterOptionInterface, Infura, Etherscan } from '../Api';
+import { wrapLimiterMethod as infuraWrap } from '../Limmiters/Infura';
+import { wrapLimiterMethod as etherscanWrap } from '../Limmiters/Etherscan';
+import { wrapLimiterMethod as etherchainWrap } from '../Limmiters/Etherchain';
+import { NetworkClient, IEthereumNetworkClient, GasPrice } from './NetworkClient';
+import { ITrackerClient, InfuraTrackerProvider } from "./Tracker";
 
 const EtherscanApi = require('etherscan-api');
-import {each, map, Dictionary} from 'lodash';
-import BigNumber from "bignumber.js";
-import Axios, {AxiosInstance, AxiosResponse, AxiosRequestConfig, AxiosError} from "axios";
-
-import {Coin, Wallet, Constants, Utils} from "../../";
-import {AdapterOptionInterface, Infura, Etherscan} from '../Api';
-import {wrapLimiterMethod as infuraWrap} from '../Limmiters/Infura';
-import {wrapLimiterMethod as etherscanWrap} from '../Limmiters/Etherscan';
-import {wrapLimiterMethod as etherchainWrap} from '../Limmiters/Etherchain';
-import {NetworkClient, IEthereumNetworkClient, GasPrice} from './NetworkClient';
-import {ITrackerClient, InfuraTrackerProvider} from "./Tracker";
 
 /**
  * @TODO This is a temporary mechanism that helps to track blocks
@@ -36,28 +35,21 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
             throw new Error("Invalid Coin. Just ETH Coin");
         }
 
-        const {network = null} = this.getOptions();
+        const { network = null } = this.getOptions();
 
         this.client = Axios.create({
             baseURL: `https://api.infura.io/v1/jsonrpc/${network ? network : 'mainnet'}`,
-            timeout: 10000
+            timeout: 10000,
         });
 
         this.etherchainClient = Axios.create({
             baseURL: "https://www.etherchain.org/api",
-            timeout: 10000
+            timeout: 10000,
         });
 
         this.etherscanClient = EtherscanApi.init(Constants.ETHERSCAN_API_KEY, network);
     }
 
-    /**
-     * @param {string} method
-     * @param {any[]} params
-     * @param {boolean} isPost
-     *
-     * @returns {Promise<JsonRPCResponse>}
-     */
     protected sendRequest(method: string,
                           params: any[] = null,
                           isPost: boolean = false): Promise<Infura.JsonRPCResponse> {
@@ -80,19 +72,19 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
         if (isPost) {
             requestConfig.method = 'POST';
             requestConfig.headers = {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
             };
             requestConfig.data = {
                 id: 1,
                 jsonrpc: "2.0",
                 method: method,
-                params: params
+                params: params,
             };
         } else {
             requestConfig.url = `/${method}`;
             requestConfig.method = 'GET';
             requestConfig.params = {
-                params: JSON.stringify(params)
+                params: JSON.stringify(params),
             };
         }
 
@@ -111,7 +103,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
      * @param {string} txid
      * @returns {Promise<WalletTransaction>}
      */
-    getTx(txid: string): Promise<Wallet.Entity.EtherTransaction | null> {
+    public getTx(txid: string): Promise<Wallet.Entity.EtherTransaction | undefined> {
         const onRequestSuccess = (response: Infura.JsonRPCResponse) => {
             const tx: Infura.Transaction = response.result;
             if (!tx) return null;
@@ -126,7 +118,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
                 to: tx.to,
                 from: tx.from,
                 data: tx.input,
-                nonce: new BigNumber(tx.nonce).toNumber()
+                nonce: new BigNumber(tx.nonce).toNumber(),
             } as Wallet.Entity.EtherTransaction;
 
             if (tx.blockNumber) {
@@ -143,7 +135,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
      * @param {string} txid
      * @returns {Promise<TransactionReceipt | null>}
      */
-    getTxReceipt(txid: string): Promise<Infura.TransactionReceipt | null> {
+    public getTxReceipt(txid: string): Promise<Infura.TransactionReceipt | undefined> {
         const onRequestSuccess = (response: Infura.JsonRPCResponse) => {
             return response.result as Infura.TransactionReceipt;
         };
@@ -151,25 +143,22 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
         return this.sendRequest('eth_getTransactionReceipt', [txid]).then(onRequestSuccess);
     }
 
-    /**
-     * @param {EtherTransaction} tx
-     * @returns {Promise<EtherTransaction>}
-     */
-    checkAndMapTxReceipt(tx: Wallet.Entity.EtherTransaction): Promise<Wallet.Entity.EtherTransaction> {
-        const onReceiptSuccess = (txReceipt: Infura.TransactionReceipt) => {
-            if (txReceipt) {
-                tx.blockHash = txReceipt.blockHash;
-                tx.blockHeight = new BigNumber(txReceipt.blockNumber).toNumber();
-                // blockTime: tx.blockTime ? new BigNumber(tx.blockTime).mul(1000).toNumber() : null;
+    public async checkAndMapTxReceipt(tx: Wallet.Entity.EtherTransaction): Promise<Wallet.Entity.EtherTransaction> {
+        const txReceipt: Infura.TransactionReceipt | undefined = await this.getTxReceipt(tx.txid);
 
-                tx.gasUsed = new BigNumber(txReceipt.gasUsed).toString();
-                tx.receiptStatus = !!(new BigNumber(txReceipt.status).toNumber());
-            }
+        if (txReceipt) {
+            const receiptProps = {
+                blockHash: txReceipt.blockHash,
+                blockHeight: new BigNumber(txReceipt.blockNumber).toNumber(),
+                // blockTime: tx.blockTime ? new BigNumber(tx.blockTime).mul(1000).toNumber() : null,
+                gasUsed: new BigNumber(txReceipt.gasUsed).toString(),
+                receiptStatus: !!(new BigNumber(txReceipt.status).toNumber()),
+            };
 
-            return tx;
-        };
+            return Object.assign({}, tx, receiptProps);
+        }
 
-        return this.getTxReceipt(tx.txid).then(onReceiptSuccess);
+        return tx;
     }
 
     /**
@@ -177,7 +166,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
      *
      * @returns {Promise<Block>}
      */
-    getBlock(blockHash: string): Promise<Wallet.Entity.Block> {
+    public getBlock(blockHash: string): Promise<Wallet.Entity.Block> {
         throw new Error('Must be implement');
     }
 
@@ -186,37 +175,34 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
      *
      * @returns {Promise<Block>}
      */
-    getBlockByNumber(blockNumber: number | string): Promise<Wallet.Entity.Block> {
-        const resolveResponse = (response) => {
-            const blockRes: Infura.Block = response.result;
-            if (!blockRes) return null;
+    public async getBlockByNumber(blockNumber: number | string): Promise<Wallet.Entity.Block | undefined> {
+        const response = await this.sendRequest('eth_getBlockByNumber', [blockNumber, true]);
 
-            return {
-                hash: blockRes.hash,
-                time: new BigNumber(blockRes.timestamp).mul(1000).toNumber(),
-                height: new BigNumber(blockRes.number).toNumber(),
-                txids: map(blockRes.transactions, tx => tx.hash),
-                original: blockRes
-            } as Wallet.Entity.Block;
-        };
+        const blockRes: Infura.Block = response.result;
+        if (!blockRes) {
+            return;
+        }
 
-        return this
-            .sendRequest('eth_getBlockByNumber', [blockNumber, true])
-            .then(resolveResponse);
+        return {
+            hash: blockRes.hash,
+            time: new BigNumber(blockRes.timestamp).mul(1000).toNumber(),
+            height: new BigNumber(blockRes.number).toNumber(),
+            txids: map(blockRes.transactions, tx => tx.hash),
+            original: blockRes,
+        } as Wallet.Entity.Block;
     }
 
 
     /**
      * @returns {Promise<GasPrice>}
      */
-    getGasPrice(): Promise<GasPrice> {
-
+    public getGasPrice(): Promise<GasPrice> {
         const standardGasPrice = new BigNumber(4).div(Constants.WEI_PER_COIN);
 
         const defaultGasPrice = {
             low: standardGasPrice,
             standard: standardGasPrice,
-            high: standardGasPrice
+            high: standardGasPrice,
         };
 
         const handleResponse = (response: AxiosResponse) => {
@@ -229,7 +215,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
             return {
                 low: new BigNumber(gasPrices.safeLow),
                 standard: new BigNumber(gasPrices.standard),
-                high: new BigNumber(gasPrices.fast)
+                high: new BigNumber(gasPrices.fast),
             } as GasPrice;
         };
 

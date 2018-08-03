@@ -49,7 +49,7 @@ function onWdCreated(wdProvider: Wallet.Provider.WDProvider) {
 
     const extractTx = (txid: string) => {
         console.log('Extracting ' + txid + ' ... ');
-        networkProvider.getTx(txid).then((tx: Wallet.Entity.WalletTransaction | null) => {
+        networkProvider.getTx(txid).then((tx: Wallet.Entity.WalletTransaction | undefined) => {
             if (!tx) {
                 setTimeout(() => {
                     extractTx(txid);

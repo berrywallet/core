@@ -1,10 +1,8 @@
 import BigNumber from "bignumber.js";
-import {Dictionary, each, map, findIndex} from "lodash";
-
-import {Coin, Wallet} from "../../";
-import {Destructable} from "../../Utils/Destructable";
-import {Api, Events} from "../";
-
+import { Dictionary, each, map, findIndex } from "lodash";
+import { Coin, Wallet } from '../../';
+import { Destructable } from '../../Utils/Destructable';
+import { Api, Events } from '../';
 import * as Tracker from './Tracker';
 
 
@@ -19,7 +17,7 @@ interface INetworkClient extends Destructable {
 
     getBlock(blockHash: string): Promise<Wallet.Entity.Block>;
 
-    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null>;
+    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | undefined>;
 
     getAddressTxs(address: string): Promise<Wallet.Entity.WalletTransaction[]>;
 
@@ -45,14 +43,14 @@ interface IEthereumNetworkClient extends INetworkClient {
 
 abstract class NetworkClient implements INetworkClient {
 
-    protected onBlocksCbs: Events.NewBlockCallback[];
-    protected onAddrTXCbs: Dictionary<Events.NewTxCallback[]>;
+    protected onBlocksCbs: Events.NewBlockCallback[] = [];
+    protected onAddrTXCbs: Dictionary<Events.NewTxCallback[]> = {};
 
     constructor(protected readonly coin: Coin.CoinInterface,
                 protected readonly options: Api.AdapterOptionInterface) {
     }
 
-    abstract getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null>;
+    abstract getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | undefined>;
 
     abstract getBlock(blockHash: string): Promise<Wallet.Entity.Block>;
 
@@ -60,84 +58,55 @@ abstract class NetworkClient implements INetworkClient {
 
     abstract broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string>;
 
-    /**
-     * @returns {CoinInterface}
-     */
-    getCoin(): Coin.CoinInterface {
+    public getCoin(): Coin.CoinInterface {
         return this.coin;
     }
 
-    /**
-     * @returns {string}
-     */
-    getApiUrl(): string {
+    public getApiUrl(): string {
         return this.options.url;
     }
 
-    /**
-     * @returns {string}
-     */
-    getWSUrl(): string {
-        return this.options.wsUrl;
+    public getWSUrl(): string {
+        return this.options.wsUrl as string;
     }
 
-    /**
-     * @returns {boolean}
-     */
-    enabledWS(): boolean {
+    public enabledWS(): boolean {
         return !!this.getWSUrl();
     }
 
-    /**
-     * @returns {AdapterOptionInterface}
-     */
-    getOptions(): Api.AdapterOptionInterface {
+    public getOptions(): Api.AdapterOptionInterface {
         return this.options;
     }
 
     /**
-     * @todo Must be implement this method for:
-     * @see {EtherscanNetworkClient}
-     * @see {BlockcypherBIPNetworkClient}
-     *
-     * @returns {ITrackerClient}
+     * @todo Must be implement this method for
      */
-    getTracker(): Tracker.ITrackerClient {
+    public getTracker(): Tracker.ITrackerClient {
         throw new Error("Tracker Client must be implement!");
     }
 
-    /**
-     * @todo Must be implement this method for:
-     * @see {InfuraNetworkClient}
-     * @see {EtherscanNetworkClient}
-     * @see {BlockcypherBIPNetworkClient}
-     *
-     * @param {string[]} addrs
-     * @returns {Promise<WalletTransaction[]>}
-     */
-    getBulkAddrsTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
-
-        const promisMap = map(addrs, (addr: string) => {
+    public async getBulkAddrsTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
+        const promiseMap = map(addrs, (addr: string) => {
             return this.getAddressTxs(addr);
         });
 
-        return Promise.all(promisMap)
-            .then((txChunks: Array<Wallet.Entity.WalletTransaction[]>) => {
-                const txList = [];
 
-                each(txChunks, (txs) => {
-                    each(txs, (tx) => {
-                        const indx = findIndex(txList, {txid: tx.txid});
-                        if (indx >= 0) {
-                            txList[indx] = Object.assign(txList[indx], tx);
-                        } else {
-                            txList.push(tx);
-                        }
-                    });
-                });
+        const txChunks: Array<Wallet.Entity.WalletTransaction[]> = await Promise.all(promiseMap);
 
-                return txList;
+        const txList = [];
+
+        each(txChunks, (txs) => {
+            each(txs, (tx) => {
+                const indx = findIndex(txList, { txid: tx.txid } as any);
+                if (indx >= 0) {
+                    txList[indx] = Object.assign(txList[indx], tx);
+                } else {
+                    txList.push(tx);
+                }
             });
+        });
+
+        return txList;
     }
 
     destruct() {
@@ -152,5 +121,5 @@ export {
     INetworkClient,
     GasPrice,
     IEthereumNetworkClient,
-    NetworkClient
-}
+    NetworkClient,
+};

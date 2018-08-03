@@ -6,7 +6,7 @@ BigNumber.config({
 });
 
 import * as Constants from "./Constants";
-import * as Debug from "./Debug";
+import * as Debug from "./debugger";
 import * as Coin from "./Coin";
 import * as HD from "./HD";
 import * as Utils from "./Utils";

@@ -1,34 +1,36 @@
-import {each, orderBy, Dictionary} from 'lodash';
-import Bottleneck from 'bottleneck';
-import Axios, {AxiosInstance, AxiosResponse} from "axios";
-
-import {Coin, Wallet} from "../../";
-import {AdapterOptionInterface, Insight} from '../Api';
-import {NetworkClient} from "./";
-import {ITrackerClient} from "./Tracker";
-import {InsightTrackerProvider} from "./Tracker/InsightTrackerProvider";
 import BigNumber from "bignumber.js";
-import {BIPGenericCoin} from "../../Coin";
+import Bottleneck from 'bottleneck';
+import { each, orderBy, Dictionary } from 'lodash';
+import Axios, { AxiosInstance, AxiosResponse } from "axios";
+
+import { Coin, Wallet } from '../../';
+import { AdapterOptionInterface, Insight } from '../Api';
+import { NetworkClient } from './';
+import { ITrackerClient } from './Tracker';
+import { InsightTrackerProvider } from './Tracker/InsightTrackerProvider';
+
+import { BIPGenericCoin } from '../../Coin';
 
 export default class InsightNetworkClient extends NetworkClient {
     protected client: AxiosInstance;
-    protected trackerClient: ITrackerClient;
     protected limiter: Bottleneck;
+
+    protected trackerClient?: ITrackerClient;
 
     /**
      * @param {CoinInterface} coin
      * @param {AdapterOptionInterface} options
      */
-    constructor(coin: Coin.CoinInterface, options: AdapterOptionInterface) {
+    public constructor(coin: Coin.CoinInterface, options: AdapterOptionInterface) {
         if (false === (coin instanceof Coin.BIPGenericCoin)) {
-            throw new Error('Insigne network for BIP Coin only');
+            throw new Error('Insight network for BIP Coin only');
         }
-        
+
         super(coin, options);
 
         this.client = Axios.create({
             baseURL: this.getApiUrl(),
-            timeout: 10000
+            timeout: 10000,
         });
 
         this.limiter = new Bottleneck(1, 500);
@@ -55,7 +57,7 @@ export default class InsightNetworkClient extends NetworkClient {
             const requestParams = {
                 url: url,
                 method: postParams ? 'POST' : 'GET',
-                data: postParams ? postParams : null
+                data: postParams ? postParams : null,
             };
 
             return this.client
@@ -72,19 +74,14 @@ export default class InsightNetworkClient extends NetworkClient {
      * @param {string} txid
      * @returns {Promise<WalletTransaction>}
      */
-    getTx(txid: string): Promise<Wallet.Entity.BIPTransaction | null> {
-        const onRequestSuccess = (data: any) => {
-            const tx: Insight.Transaction = data;
+    public async getTx(txid: string): Promise<Wallet.Entity.BIPTransaction | undefined> {
+        const data: any = await this.sendRequest(`/tx/${txid}`);
+        const tx: Insight.Transaction = data as Insight.Transaction;
 
-            return tx ? Insight.toWalletTx(tx, this.coin) : null;
-        };
-
-        return this
-            .sendRequest(`/tx/${txid}`)
-            .then(onRequestSuccess);
+        return tx ? Insight.toWalletTx(tx, this.coin) : undefined;
     }
 
-    getFeesPerKB(): Promise<Dictionary<BigNumber>> {
+    public getFeesPerKB(): Promise<Dictionary<BigNumber>> {
         const resolveFeePerByte = (data, index, defaultFeeProp: string): BigNumber => {
             if (data[index] > 0) {
                 return new BigNumber(data[index]).div(1024).round(8);
@@ -97,16 +94,16 @@ export default class InsightNetworkClient extends NetworkClient {
             return {
                 low: resolveFeePerByte(data, 12, 'lowFeePerByte'),
                 standard: resolveFeePerByte(data, 3, 'defaultFeePerByte'),
-                high: resolveFeePerByte(data, 1, 'highFeePerByte')
-            }
+                high: resolveFeePerByte(data, 1, 'highFeePerByte'),
+            };
         };
 
         const onRequestError = () => {
             return {
                 low: (this.coin as BIPGenericCoin).lowFeePerByte,
                 standard: (this.coin as BIPGenericCoin).defaultFeePerByte,
-                high: (this.coin as BIPGenericCoin).highFeePerByte
-            }
+                high: (this.coin as BIPGenericCoin).highFeePerByte,
+            };
         };
 
         return this
@@ -119,15 +116,15 @@ export default class InsightNetworkClient extends NetworkClient {
      * @param {string} blockHash
      * @returns {Promise<Block>}
      */
-    getBlock(blockHash: string): Promise<Wallet.Entity.Block> {
+    public getBlock(blockHash: string): Promise<Wallet.Entity.Block> {
         const onRequestSuccess = (block: Insight.Block) => {
             return {
                 hash: block.hash,
                 height: block.height,
                 time: block.time * 1000,
                 txids: block.tx,
-                original: block
-            } as Wallet.Entity.Block
+                original: block,
+            } as Wallet.Entity.Block;
         };
 
         return this
@@ -139,9 +136,9 @@ export default class InsightNetworkClient extends NetworkClient {
      * @param {Transaction} transaction
      * @returns {Promise<string>}
      */
-    broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
+    public broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
         const requestData = {
-            rawtx: transaction.toBuffer().toString('hex')
+            rawtx: transaction.toBuffer().toString('hex'),
         };
 
         const onRequestSuccess = (data: any) => data.txid;
@@ -184,7 +181,7 @@ export default class InsightNetworkClient extends NetworkClient {
      * @param {string} address
      * @returns {Promise<BIPTransaction[]>}
      */
-    getAddressTxs(address: string): Promise<Wallet.Entity.BIPTransaction[]> {
+    public getAddressTxs(address: string): Promise<Wallet.Entity.BIPTransaction[]> {
         return this.pureGetAddrsTxs([address], 0, 50);
     }
 
@@ -192,14 +189,14 @@ export default class InsightNetworkClient extends NetworkClient {
      * @param {string[]} addrs
      * @returns {Promise<WalletTransaction[]>}
      */
-    getBulkAddrsTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
+    public getBulkAddrsTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
         return this.pureGetAddrsTxs(addrs, 0, 50);
     }
 
     /**
      * @returns {ITrackerClient}
      */
-    getTracker(): ITrackerClient {
+    public getTracker(): ITrackerClient {
         if (!this.trackerClient) {
             this.trackerClient = new InsightTrackerProvider(this);
         }
@@ -207,7 +204,7 @@ export default class InsightNetworkClient extends NetworkClient {
         return this.trackerClient;
     }
 
-    destruct() {
+    public destruct(): void {
         if (this.trackerClient) {
             this.trackerClient.destruct();
 

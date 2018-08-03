@@ -35,7 +35,7 @@ export default class EtherscanNetworkClient extends NetworkClient implements IEt
      * @param {string} txid
      * @returns {WalletTransaction}
      */
-    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null> {
+    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | undefined> {
         const onRequestSuccess = (response) => {
             const tx: Etherscan.Transaction = response.result;
 

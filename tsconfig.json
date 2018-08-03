@@ -3,16 +3,26 @@
         "target": "es6",
         "module": "commonjs",
         "moduleResolution": "node",
-        "baseUrl": "./",
-        "rootDir": "./src",
-        "outDir": "./dist/",
+        "noLib": false,
+        "strict": false,
+        "declaration": true,
         "noImplicitAny": false,
         "removeComments": true,
-        "noLib": false,
         "preserveConstEnums": true,
-        "declaration": true,
+        "allowSyntheticDefaultImports": true,
         "suppressImplicitAnyIndexErrors": true,
-        "allowSyntheticDefaultImports": true
+        "rootDir": "./src",
+        "baseUrl": "./src",
+        "outDir": "./dist/",
+        "typeRoots": [
+            "src/definitions",
+            "node_modules/@types"
+        ],
+        "lib": [
+            "es5",
+            "es6",
+            "es2015"
+        ]
     },
     "include": [
         "src/**/*",

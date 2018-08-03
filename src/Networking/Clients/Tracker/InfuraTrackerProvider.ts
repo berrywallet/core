@@ -1,9 +1,9 @@
-import {each} from 'lodash';
+import { each } from 'lodash';
 
-import {Wallet} from '../../../';
-import {Infura} from '../../Api';
-import {InfuraNetworkClient} from '../';
-import {TrackerClient} from './';
+import { Wallet } from '../../../';
+import { Infura } from '../../Api';
+import { InfuraNetworkClient } from '../';
+import { TrackerClient } from './';
 
 const NEW_BLOCK_CHECK_TIMEOUT = 15000;
 const RECONNECT_TIMEOUT = 30000;
@@ -21,17 +21,18 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
     /**
      * @param {InfuraNetworkClient} networkClient
      */
-    constructor(networkClient: InfuraNetworkClient) {
+    public constructor(networkClient: InfuraNetworkClient) {
         super(networkClient);
 
         this.startBlockTracking();
     }
 
-    handleBlockError = (error) => {
+    protected handleBlockError = (error): void => {
         if (this.blockTrackInterval) {
             clearInterval(this.blockTrackInterval);
-            this.currentBlockHeight = null;
-            this.currentBlockTime = null;
+
+            this.currentBlockHeight = undefined;
+            this.currentBlockTime = undefined;
         }
 
         this.fireConnectionError(error);
@@ -49,7 +50,6 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
     };
 
     protected startBlockTracking() {
-
         this.enableBlockTracking = true;
 
         this.trackLastOrNextBlock();
@@ -57,7 +57,6 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
         this.blockTrackInterval = setInterval(() => {
             this.trackLastOrNextBlock();
         }, NEW_BLOCK_CHECK_TIMEOUT);
-
     }
 
     /**
@@ -69,7 +68,7 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
 
         const originalResponse: Infura.Block = block.original;
         if (originalResponse) {
-            const {addrs = [], callback = null} = this.addrTxEvents;
+            const { addrs = [], callback = null } = this.addrTxEvents;
             each(originalResponse.transactions, (tx: Infura.Transaction) => {
 
                 if (this.isAddrTrack(tx.to) || this.isAddrTrack(tx.from)) {
@@ -87,6 +86,10 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
 
         return super.fireNewBlock(block);
     }
+
+    protected getCurrentBlockTime(): number {
+        return this.currentBlockTime || 0;
+    };
 
     /**
      * @param {WalletTransaction} tx
@@ -106,34 +109,36 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
         }
     }
 
-    protected trackLastOrNextBlock(): Promise<Wallet.Entity.Block | null> {
+    protected async trackLastOrNextBlock(): Promise<Wallet.Entity.Block | void> {
         if (!this.enableBlockTracking) {
             return;
         }
 
-        const handleResponse = (block: Wallet.Entity.Block = null) => {
-            this.activateConnection();
-
-            if (block) {
-                this.fireNewBlock(block);
-                this.trackLastOrNextBlock();
-
-                return block;
-            }
-        };
-
         let blockHeight: string | number = 'latest';
-        if (this.currentBlockHeight && (new Date().getTime() - this.currentBlockTime < CONNECTION_TIMEOUT)) {
+        if (this.currentBlockHeight && (new Date().getTime() - this.getCurrentBlockTime() < CONNECTION_TIMEOUT)) {
             blockHeight = this.currentBlockHeight + 1;
         }
 
-        return this.networkClient
-            .getBlockByNumber(blockHeight)
-            .then(handleResponse)
-            .catch(this.handleBlockError);
+        try {
+            const block: Wallet.Entity.Block | undefined = await this.networkClient.getBlockByNumber(blockHeight);
+            this.activateConnection();
+
+            if (!block) {
+                return;
+            }
+
+            this.fireNewBlock(block);
+            this.trackLastOrNextBlock();
+
+            return block;
+        } catch (error) {
+            this.handleBlockError(error);
+
+            return;
+        }
     }
 
-    destruct() {
+    public destruct() {
         this.enableBlockTracking = false;
 
         if (this.blockTrackInterval) {
@@ -142,5 +147,4 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
 
         super.destruct();
     }
-
 }

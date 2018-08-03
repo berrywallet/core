@@ -19,7 +19,7 @@ interface NetworkProviderInterface extends Destructable {
 
     getAddressTxs(address: string): Promise<Wallet.Entity.WalletTransaction[]>;
 
-    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction>;
+    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | undefined>;
 
     getTracker(): Networking.Clients.Tracker.ITrackerClient;
 
@@ -111,8 +111,8 @@ class NetworkProvider implements NetworkProviderInterface {
      * @param {string} txid
      * @returns {Promise<WalletTransaction>}
      */
-    public getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null> {
-        const client = this.getClient(0); // this.rotateClient(0);
+    public getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | undefined> {
+        const client = this.getClient(0);
 
         return client.getTx(txid).catch(this.catchError('getTx', client));
     }
