@@ -1,14 +1,12 @@
 import BigNumber from 'bignumber.js';
 import Bottleneck from 'bottleneck';
 import { each, orderBy, Dictionary } from 'lodash';
-import Axios, { AxiosInstance, AxiosResponse } from "axios";
-
+import Axios, { AxiosInstance, AxiosResponse } from 'axios';
 import { Coin, Wallet } from '../../';
 import { AdapterOptionInterface, Insight } from '../Api';
 import { NetworkClient } from './';
 import { ITrackerClient } from './Tracker';
 import { InsightTrackerProvider } from './Tracker/InsightTrackerProvider';
-
 import { BIPGenericCoin } from '../../Coin';
 
 export default class InsightNetworkClient extends NetworkClient {
@@ -61,7 +59,8 @@ export default class InsightNetworkClient extends NetworkClient {
             };
 
             return this.client
-                .request(requestParams).then(onRequestSuccess)
+                .request(requestParams)
+                .then(onRequestSuccess)
                 .catch(error => reject(error));
         };
 
@@ -84,7 +83,7 @@ export default class InsightNetworkClient extends NetworkClient {
     public getFeesPerKB(): Promise<Dictionary<BigNumber>> {
         const resolveFeePerByte = (data, index, defaultFeeProp: string): BigNumber => {
             if (data[index] > 0) {
-                return new BigNumber(data[index]).div(1024).round(8);
+                return new BigNumber(data[index]).div(1024).decimalPlaces(8);
             }
 
             return this.coin[defaultFeeProp];
@@ -136,16 +135,14 @@ export default class InsightNetworkClient extends NetworkClient {
      * @param {Transaction} transaction
      * @returns {Promise<string>}
      */
-    public broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
+    public async broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
         const requestData = {
             rawtx: transaction.toBuffer().toString('hex'),
         };
 
-        const onRequestSuccess = (data: any) => data.txid;
+        const data = await this.sendRequest<any>('/tx/send', requestData);
 
-        return this
-            .sendRequest<string>('/tx/send', requestData)
-            .then(onRequestSuccess);
+        return data.txid as string;
     }
 
     /**

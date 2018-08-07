@@ -1,6 +1,6 @@
 import {each} from 'lodash';
-import {Events} from "./Networking";
-import InfuraNetworkClient from "./Networking/Clients/InfuraNetworkClient";
+import {Events} from './Networking';
+import InfuraNetworkClient from './Networking/Clients/InfuraNetworkClient';
 import {Coin, Networking, Wallet} from './';
 
 const coin = Coin.makeCoin(Coin.Unit.LTCt);

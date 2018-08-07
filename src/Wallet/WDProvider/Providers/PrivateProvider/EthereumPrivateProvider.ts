@@ -1,18 +1,16 @@
-import {filter, each, chain, Dictionary} from 'lodash';
-import BigNumber from "bignumber.js";
-
-import {Coin, Networking, Constants} from '../../../../';
-import {Entity} from "../../../";
-
-import {AbstractPrivateProvider} from './AbstractPrivateProvider';
-import {IEthereumNetworkClient, GasPrice} from "../../../../Networking/Clients";
+import { filter } from 'lodash';
+import BigNumber from 'bignumber.js';
+import { Coin, Constants } from '../../../../';
+import { Entity } from '../../../';
+import { AbstractPrivateProvider } from './AbstractPrivateProvider';
+import { IEthereumNetworkClient, GasPrice } from '../../../../Networking/Clients';
 
 export class EthereumPrivateProvider extends AbstractPrivateProvider {
 
     public getTxNonce(fromAddress: Entity.WalletAddress) {
         return filter(
             this.wdProvider.tx.list(),
-            (tx: Entity.EtherTransaction) => (tx.from.toLowerCase() === fromAddress.address.toLowerCase())
+            (tx: Entity.EtherTransaction) => (tx.from.toLowerCase() === fromAddress.address.toLowerCase()),
         ).length;
     }
 
@@ -22,7 +20,7 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
      *
      * @returns {Promise<BigNumber>}
      */
-    public getGasLimit(address: Coin.Key.Address = null, value: BigNumber = null): Promise<BigNumber> {
+    public async getGasLimit(address: Coin.Key.Address = null, value: BigNumber = null): Promise<BigNumber> {
         if (address && value) {
             const networkClient = this.wdProvider.getNetworkProvider().getClient(0);
             // @TODO Need to request a etherscan for optimal gasLimit for current address transaction
@@ -33,7 +31,7 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
             //     });
         }
 
-        return Promise.resolve<BigNumber>(Constants.MIN_GAS_LIMIT);
+        return Constants.MIN_GAS_LIMIT;
     }
 
     /**
@@ -57,7 +55,7 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
                 break;
         }
 
-        return Promise.resolve(gasPriceGWEI)
+        return Promise.resolve(gasPriceGWEI);
     }
 
     /**
@@ -72,12 +70,12 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
                               feeType: Coin.FeeTypes = Coin.FeeTypes.Medium): Promise<BigNumber> {
         const promises = [
             this.getGasPrice(feeType),
-            this.getGasLimit(address, value)
+            this.getGasLimit(address, value),
         ];
 
         const [gasPrice, gasLimit]: BigNumber[] = await Promise.all(promises);
 
-        return Promise.resolve(gasLimit.mul(gasPrice.div(Constants.GWEI_PER_COIN)));
+        return Promise.resolve(gasLimit.times(gasPrice.div(Constants.GWEI_PER_COIN)));
     }
 
     /**
@@ -87,9 +85,10 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
      *
      * @returns {Transaction}
      */
-    public createTransaction(address: Coin.Key.Address,
-                             value: BigNumber,
-                             feeType: Coin.FeeTypes = Coin.FeeTypes.Medium): Promise<Coin.Transaction.Transaction> {
+    public async createTransaction(address: Coin.Key.Address,
+                                   value: BigNumber,
+                                   feeType: Coin.FeeTypes = Coin.FeeTypes.Medium,
+    ): Promise<Coin.Transaction.Transaction> {
 
         let coin = this.wdProvider.coin as Coin.Defined.Ethereum;
         let balance = this.wdProvider.balance;
@@ -100,11 +99,11 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
         const addressBalance = balance.addrBalances[addressFrom.address];
 
         const currentBalance = addressBalance.receive
-            .sub(addressBalance.spend)
-            .sub(addressBalance.unconfirmed);
+            .minus(addressBalance.spend)
+            .minus(addressBalance.unconfirmed);
 
-        if (currentBalance.lessThan(value)) {
-            throw new Error("Insufficient funds");
+        if (currentBalance.isLessThan(value)) {
+            throw new Error('Insufficient funds');
         }
 
         let txBuilder = new Coin.Transaction.Builder.EthereumTransactionBuilder(coin);
@@ -116,16 +115,14 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
 
         const promises = [
             this.getGasPrice(feeType),
-            this.getGasLimit(address, value)
+            this.getGasLimit(address, value),
         ];
 
-        return Promise.all(promises).then((results: BigNumber[]) => {
-            const [gasPrice, gasLimit] = results;
+        const [gasPrice, gasLimit]: BigNumber[] = await Promise.all(promises);
 
-            txBuilder.gasPrice = gasPrice.div(Constants.GWEI_PER_COIN);
-            txBuilder.gasLimit = gasLimit.toNumber();
+        txBuilder.gasPrice = gasPrice.div(Constants.GWEI_PER_COIN);
+        txBuilder.gasLimit = gasLimit.toNumber();
 
-            return txBuilder.buildSigned(privateKeys);
-        });
+        return txBuilder.buildSigned(privateKeys);
     }
 }

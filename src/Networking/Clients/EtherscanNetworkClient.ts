@@ -79,7 +79,7 @@ export default class EtherscanNetworkClient extends NetworkClient implements IEt
         return {
             low: estimateGasPrice.div(2),
             standard: estimateGasPrice,
-            high: estimateGasPrice.mul(5),
+            high: estimateGasPrice.times(5),
         } as GasPrice;
     }
 

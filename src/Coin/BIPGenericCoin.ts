@@ -50,7 +50,7 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
     }
 
     public get highFeePerByte(): BigNumber {
-        return this.defaultFeePerByte.mul(4);
+        return this.defaultFeePerByte.times(4);
     }
 
     public get minFeePerByte(): BigNumber {

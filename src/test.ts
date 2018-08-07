@@ -75,7 +75,8 @@ function onWdCreated(wdProvider: Wallet.Provider.WDProvider) {
 
     console.log('Addrs: ');
     each(balance.addrBalances, (balance: Wallet.Entity.Balance, addr: string) => {
-        console.log(`${addr}: ${balance.receive.toNumber()} > ${balance.unconfirmed.toNumber()} > ${balance.receive.sub(balance.spend).sub(balance.unconfirmed).toNumber()}`);
+        console.log(
+            `${addr}: ${balance.receive.toNumber()} > ${balance.unconfirmed.toNumber()} > ${balance.receive.minus(balance.spend).minus(balance.unconfirmed).toNumber()}`);
     });
     console.log('');
     console.log('Txs: ');

@@ -13,12 +13,4 @@ import * as Utils from './Utils';
 import * as Networking from './Networking';
 import * as Wallet from './Wallet';
 
-export {
-    Constants,
-    Coin,
-    HD,
-    Wallet,
-    Networking,
-    Utils,
-    Debug,
-};
+export { Constants, Coin, HD, Wallet, Networking, Utils, Debug };

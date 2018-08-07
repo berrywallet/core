@@ -150,7 +150,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
             const receiptProps = {
                 blockHash: txReceipt.blockHash,
                 blockHeight: new BigNumber(txReceipt.blockNumber).toNumber(),
-                // blockTime: tx.blockTime ? new BigNumber(tx.blockTime).mul(1000).toNumber() : null,
+                // blockTime: tx.blockTime ? new BigNumber(tx.blockTime).times(1000).toNumber() : null,
                 gasUsed: new BigNumber(txReceipt.gasUsed).toString(),
                 receiptStatus: !!(new BigNumber(txReceipt.status).toNumber()),
             };
@@ -185,7 +185,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
 
         return {
             hash: blockRes.hash,
-            time: new BigNumber(blockRes.timestamp).mul(1000).toNumber(),
+            time: new BigNumber(blockRes.timestamp).times(1000).toNumber(),
             height: new BigNumber(blockRes.number).toNumber(),
             txids: map(blockRes.transactions, tx => tx.hash),
             original: blockRes,
@@ -244,7 +244,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
         //     return this.etherscanClient
         //         .proxy.eth_estimateGas(
         //             address.toString().toLowerCase(),
-        //             value.mul(Constants.WEI_PER_COIN).toNumber()
+        //             value.times(Constants.WEI_PER_COIN).toNumber()
         //         )
         //         .then(onRequestSuccess);
         // });

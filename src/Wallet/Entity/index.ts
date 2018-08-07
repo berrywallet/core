@@ -1,6 +1,6 @@
-import BigNumber from "bignumber.js";
-import {Dictionary, List} from 'lodash';
-import {Coin, HD} from "../../";
+import BigNumber from 'bignumber.js';
+import { Dictionary, List } from 'lodash';
+import { Coin, HD } from '../../';
 
 interface Block {
     hash: string;
@@ -110,5 +110,5 @@ export {
     Balance,
     UnspentTXOutput,
     WDBalance,
-    WalletData
-}
+    WalletData,
+};

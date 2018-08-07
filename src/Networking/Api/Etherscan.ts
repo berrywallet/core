@@ -49,7 +49,7 @@ function toWalletTx(coin: Coin.CoinInterface, tx: Transaction): Wallet.Entity.Et
 
     if (tx.blockNumber) {
         txResult.blockHeight = new BigNumber(tx.blockNumber).toNumber();
-        txResult.blockTime = new BigNumber(tx.timeStamp).mul(1000).toNumber();
+        txResult.blockTime = new BigNumber(tx.timeStamp).times(1000).toNumber();
         txResult.receiptStatus = !!(new BigNumber(tx.txreceipt_status).toNumber());
         txResult.gasUsed = new BigNumber(tx.gasUsed).toString();
     }

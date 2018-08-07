@@ -1,13 +1,12 @@
-import BigNumber from "bignumber.js";
+import BigNumber from 'bignumber.js';
 
-import * as Key from "../Key";
-import * as Utils from "../../Utils";
-import * as Constants from "../../Constants";
+import * as Key from '../Key';
+import * as Utils from '../../Utils';
+import * as Constants from '../../Constants';
 
-import {CoinInterface, TransactionScheme} from "../";
-import {Transaction} from './Transaction';
-import {Ethereum} from "../Defined";
-
+import { CoinInterface, TransactionScheme } from '../';
+import { Transaction } from './Transaction';
+import { Ethereum } from '../Defined';
 
 const EthereumTx = require('ethereumjs-tx');
 

@@ -1,9 +1,9 @@
 import * as BitcoinJS from 'bitcoinjs-lib';
-import BigNumber from "bignumber.js";
+import BigNumber from 'bignumber.js';
 import * as Coin from "../";
 import * as Utils from "../../Utils";
 import * as Constants from "../../Constants";
-import {BIPGenericCoin} from "../BIPGenericCoin";
+import { BIPGenericCoin } from "../BIPGenericCoin";
 import * as Transaction from "./";
 import * as Key from "../Key";
 
@@ -36,14 +36,14 @@ export class BIPTransactionBuilder implements TransactionBuilder {
     }
 
     get scheme(): Coin.TransactionScheme {
-        return Coin.TransactionScheme.INPUTS_OUTPUTS
+        return Coin.TransactionScheme.INPUTS_OUTPUTS;
     }
 
     protected createTxBuilder(): BitcoinJS.TransactionBuilder {
         return new BitcoinJS.TransactionBuilder(this.network);
     }
 
-    buildSigned(keys: Array<Key.Private>): Transaction.BIPTransaction {
+    public buildSigned(keys: Array<Key.Private>): Transaction.BIPTransaction {
         for (let i in keys) {
             this.txBuilder.sign(Number(i), BitcoinJS.ECPair.fromWIF(keys[i].toString(), this.network));
         }
@@ -70,7 +70,7 @@ export class BIPTransactionBuilder implements TransactionBuilder {
     addOutput(address: Key.Address, value: BigNumber): number {
         Utils.validateAmountValue(value, this.coin.minValue, false);
 
-        return this.txBuilder.addOutput(address.toString(), value.mul(Constants.SATOSHI_PER_COIN).toNumber());
+        return this.txBuilder.addOutput(address.toString(), value.times(Constants.SATOSHI_PER_COIN).toNumber());
     }
 
     setLockTime(locktime: number): void {
@@ -98,7 +98,7 @@ export class EthereumTransactionBuilder implements TransactionBuilder {
     private _data: Buffer;
     private _to: Key.Address;
 
-    constructor(coin: Coin.Defined.Ethereum) {
+    public constructor(coin: Coin.Defined.Ethereum) {
         if (!(coin instanceof Coin.Defined.Ethereum)) {
             throw TypeError("Only Ethereum coin supported");
         }
@@ -107,11 +107,11 @@ export class EthereumTransactionBuilder implements TransactionBuilder {
         this.reset();
     }
 
-    get scheme(): Coin.TransactionScheme {
-        return Coin.TransactionScheme.FROM_TO
+    public get scheme(): Coin.TransactionScheme {
+        return Coin.TransactionScheme.FROM_TO;
     }
 
-    buildSigned(keys: Key.Private[]): Transaction.EthereumTransaction {
+    public buildSigned(keys: Key.Private[]): Transaction.EthereumTransaction {
         if (keys.length !== 1) {
             throw new Error("Ethereum requires one private key");
         }
@@ -122,7 +122,7 @@ export class EthereumTransactionBuilder implements TransactionBuilder {
         return new Transaction.EthereumTransaction(this.coin, tx);
     }
 
-    buildUnsigned(): Transaction.EthereumTransaction {
+    public buildUnsigned(): Transaction.EthereumTransaction {
         if (this.to === null && this.data === null) {
             throw new Error("Either data or to must be set");
         }
@@ -130,16 +130,16 @@ export class EthereumTransactionBuilder implements TransactionBuilder {
         let ethTx = new EthereumTx;
         ethTx.chainId = this.coin.chainId;
         ethTx.nonce = this.nonce;
-        ethTx.gasPrice = Utils.bigNumberToBuffer(this.gasPrice.mul(Constants.WEI_PER_COIN));
+        ethTx.gasPrice = Utils.bigNumberToBuffer(this.gasPrice.times(Constants.WEI_PER_COIN));
         ethTx.gasLimit = this.gasLimit;
         ethTx.to = this.to ? this.to.toBuffer() : new Buffer('');
         ethTx.data = this.data;
-        ethTx.value = Utils.bigNumberToBuffer(this.value.mul(Constants.WEI_PER_COIN));
+        ethTx.value = Utils.bigNumberToBuffer(this.value.times(Constants.WEI_PER_COIN));
 
         return new Transaction.EthereumTransaction(this.coin, ethTx);
     }
 
-    reset() {
+    public reset() {
         this.nonce = 0;
         this.gasPrice = this.coin.defaultGasPrice;
         this.gasLimit = this.coin.defaultGasLimit;
@@ -149,60 +149,60 @@ export class EthereumTransactionBuilder implements TransactionBuilder {
     }
 
 
-    get nonce(): number {
+    public get nonce(): number {
         return this._nonce;
     }
 
-    set nonce(value: number) {
-        if (!new BigNumber(value).isInt() || value < 0) {
+    public set nonce(value: number) {
+        if (!new BigNumber(value).isInteger() || value < 0) {
             throw new RangeError("Nonce must be a positive integer");
         }
         this._nonce = value;
     }
 
-    get gasPrice(): BigNumber {
+    public get gasPrice(): BigNumber {
         return this._gasPrice;
     }
 
-    set gasPrice(value: BigNumber) {
+    public set gasPrice(value: BigNumber) {
         Utils.validateAmountValue(value, this.coin.minValue, true);
         this._gasPrice = value;
     }
 
-    get gasLimit(): number {
+    public get gasLimit(): number {
         return this._gasLimit;
     }
 
-    set gasLimit(value: number) {
+    public set gasLimit(value: number) {
         let bn = new BigNumber(value);
-        if (!bn.isInt() || bn.isNegative()) {
+        if (!bn.isInteger() || bn.isNegative()) {
             throw new RangeError("gasLimit must be a positive integer");
         }
         this._gasLimit = value;
     }
 
-    get value(): BigNumber {
+    public get value(): BigNumber {
         return this._value;
     }
 
-    set value(value: BigNumber) {
+    public set value(value: BigNumber) {
         Utils.validateAmountValue(value, this.coin.minValue, true);
         this._value = value;
     }
 
-    get data(): Buffer {
+    public get data(): Buffer {
         return this._data;
     }
 
-    set data(value: Buffer) {
+    public set data(value: Buffer) {
         this._data = value;
     }
 
-    get to(): Key.Address {
+    public get to(): Key.Address {
         return this._to;
     }
 
-    set to(value: Key.Address) {
+    public set to(value: Key.Address) {
         this._to = value;
     }
 }

@@ -84,7 +84,7 @@ export function validateAmountValue(value: BigNumber, minValue: BigNumber, allow
 
 
 export function bigNumberToBuffer(value: BigNumber): Buffer {
-    if (!value.isInt()) {
+    if (!value.isInteger()) {
         throw new Error("Value must be integer")
     }
 
