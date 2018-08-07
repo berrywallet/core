@@ -1,11 +1,11 @@
-import BigNumber from "bignumber.js";
+import BigNumber from 'bignumber.js';
 
-import {Coin, HD} from "../../../../";
-import {Entity, Provider} from "../../../";
-import {BIPPrivateProvider} from "./BIPPrivateProvider";
-import {EthereumPrivateProvider} from "./EthereumPrivateProvider";
+import { Coin, HD } from '../../../../';
+import { Entity, Provider } from '../../../';
+import { BIPPrivateProvider } from './bip-private-provider';
+import { EthereumPrivateProvider } from './ethereum-private-provider';
 
-export interface PrivateProviderInterface {
+export interface IPrivateProvider {
     /**
      * Method return {Coin.Private.NodeInterface} of specific address from WalletData
      *
@@ -57,7 +57,7 @@ export interface PrivateProviderInterface {
  * @param {Buffer} seed
  * @param {WDProvider} wdProvider
  */
-export function createPrivateProvider(seed: Buffer, wdProvider: Provider.WDProvider): PrivateProviderInterface {
+export function createPrivateProvider(seed: Buffer, wdProvider: Provider.WDProvider): IPrivateProvider {
     switch (wdProvider.coin.getTransactionScheme()) {
         case Coin.TransactionScheme.INPUTS_OUTPUTS: {
             return new BIPPrivateProvider(seed, wdProvider);

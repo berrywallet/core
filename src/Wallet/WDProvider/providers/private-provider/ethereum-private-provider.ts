@@ -1,16 +1,17 @@
 import { filter } from 'lodash';
 import BigNumber from 'bignumber.js';
+import { IEthereumNetworkClient, GasPrice } from '../../../../Networking/Clients';
 import { Coin, Constants } from '../../../../';
 import { Entity } from '../../../';
-import { AbstractPrivateProvider } from './AbstractPrivateProvider';
-import { IEthereumNetworkClient, GasPrice } from '../../../../Networking/Clients';
+import { AbstractPrivateProvider } from './abstract-private-provider';
+
 
 export class EthereumPrivateProvider extends AbstractPrivateProvider {
 
     public getTxNonce(fromAddress: Entity.WalletAddress) {
         return filter(
             this.wdProvider.tx.list(),
-            (tx: Entity.EtherTransaction) => (tx.from.toLowerCase() === fromAddress.address.toLowerCase()),
+            (tx: Entity.EtherTransaction) => tx.from.toLowerCase() === fromAddress.address.toLowerCase(),
         ).length;
     }
 
@@ -55,7 +56,7 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
                 break;
         }
 
-        return Promise.resolve(gasPriceGWEI);
+        return gasPriceGWEI;
     }
 
     /**
@@ -65,17 +66,18 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
      *
      * @returns {Promise<BigNumber>}
      */
-    public async calculateFee(value: BigNumber,
-                              address: Coin.Key.Address,
-                              feeType: Coin.FeeTypes = Coin.FeeTypes.Medium): Promise<BigNumber> {
-        const promises = [
+    public async calculateFee(
+        value: BigNumber,
+        address: Coin.Key.Address,
+        feeType: Coin.FeeTypes = Coin.FeeTypes.Medium,
+    ): Promise<BigNumber> {
+
+        const [gasPrice, gasLimit]: BigNumber[] = await Promise.all([
             this.getGasPrice(feeType),
             this.getGasLimit(address, value),
-        ];
+        ]);
 
-        const [gasPrice, gasLimit]: BigNumber[] = await Promise.all(promises);
-
-        return Promise.resolve(gasLimit.times(gasPrice.div(Constants.GWEI_PER_COIN)));
+        return gasLimit.times(gasPrice.div(Constants.GWEI_PER_COIN));
     }
 
     /**
@@ -85,9 +87,10 @@ export class EthereumPrivateProvider extends AbstractPrivateProvider {
      *
      * @returns {Transaction}
      */
-    public async createTransaction(address: Coin.Key.Address,
-                                   value: BigNumber,
-                                   feeType: Coin.FeeTypes = Coin.FeeTypes.Medium,
+    public async createTransaction(
+        address: Coin.Key.Address,
+        value: BigNumber,
+        feeType: Coin.FeeTypes = Coin.FeeTypes.Medium,
     ): Promise<Coin.Transaction.Transaction> {
 
         let coin = this.wdProvider.coin as Coin.Defined.Ethereum;

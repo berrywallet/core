@@ -2,7 +2,7 @@ import { each, chain, Dictionary } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { Coin, Constants, HD } from '../../../../';
 import { Entity } from '../../../';
-import { AbstractPrivateProvider } from './AbstractPrivateProvider';
+import { AbstractPrivateProvider } from './abstract-private-provider';
 import InsightNetworkClient from '../../../../Networking/Clients/InsightNetworkClient';
 
 const coinSelect = require('coinselect');

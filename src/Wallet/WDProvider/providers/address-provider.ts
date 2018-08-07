@@ -1,8 +1,8 @@
-import {filter, find, first, Dictionary, sumBy} from 'lodash';
+import { filter, find, first, Dictionary, sumBy } from 'lodash';
 
-import * as HD from "../../../HD";
-import * as Coin from "../../../Coin";
-import * as Entity from "../../Entity";
+import * as HD from '../../../HD';
+import * as Coin from '../../../Coin';
+import * as Entity from '../../Entity';
 
 import SimpleProvider from './SimpleProvider';
 
@@ -24,11 +24,11 @@ export default class AddressProvider extends SimpleProvider {
         const newAddress: Entity.WalletAddress = {
             address: address,
             type: type,
-            index: index
+            index: index,
         };
 
         this.setData({
-            addresses: [...this.getWalletData().addresses, newAddress]
+            addresses: [...this.getWalletData().addresses, newAddress],
         });
 
         return newAddress;
@@ -61,7 +61,7 @@ export default class AddressProvider extends SimpleProvider {
      * @returns {WalletAddress | null}
      */
     get(address: string): Entity.WalletAddress | null {
-        return find(this.getWalletData().addresses, {address: address});
+        return find(this.getWalletData().addresses, { address: address });
     }
 
     /**

@@ -3,9 +3,9 @@ import BigNumber from 'bignumber.js';
 import * as Coin from "../";
 import * as Utils from "../../Utils";
 import * as Constants from "../../Constants";
-import { BIPGenericCoin } from "../BIPGenericCoin";
 import * as Transaction from "./";
 import * as Key from "../Key";
+import { BIPGenericCoin } from "../BIPGenericCoin";
 
 const EthereumTx = require('ethereumjs-tx');
 
@@ -147,7 +147,6 @@ export class EthereumTransactionBuilder implements TransactionBuilder {
         this.data = null;
         this.to = null;
     }
-
 
     public get nonce(): number {
         return this._nonce;

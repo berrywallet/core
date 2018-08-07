@@ -13,10 +13,56 @@ export interface InputElement {
 export class BalanceCalculator {
 
     private readonly coin: Coin.CoinInterface;
+    private readonly wdProvider: Wallet.Provider.WDProvider;
 
-    public constructor(private readonly wdProvider: Wallet.Provider.WDProvider) {
+    public constructor(wdProvider: Wallet.Provider.WDProvider) {
+        this.wdProvider = wdProvider;
         this.coin = this.wdProvider.coin;
     }
+
+    public calc(): Wallet.Entity.WDBalance {
+        switch (this.coin.getBalanceScheme()) {
+            case Coin.BalanceScheme.UTXO: {
+                return this.calcUTXOBalance();
+            }
+
+            case Coin.BalanceScheme.ADDRESS_BALANCE: {
+                return this.calcAddressBalance();
+            }
+        }
+
+        throw new Error('Not implement balance scheme');
+    }
+
+
+    protected generateEmptyBalance(): Wallet.Entity.WDBalance {
+        const balance: Wallet.Entity.WDBalance = {
+            addrBalances: {},
+            txBalances: {},
+            utxo: [],
+        };
+
+        const { addresses, txs } = this.wdProvider.getData();
+
+        each(addresses, (addr: Wallet.Entity.WalletAddress) => {
+            const normalizedAddress = this.coin.getKeyFormat().parseAddress(addr.address).toString();
+            balance.addrBalances[normalizedAddress] = {
+                receive: new BigNumber(0),
+                spend: new BigNumber(0),
+                unconfirmed: new BigNumber(0),
+            };
+        });
+
+        each(txs, (tx: Wallet.Entity.WalletTransaction) => {
+            balance.txBalances[tx.txid] = {
+                receive: new BigNumber(0),
+                spend: new BigNumber(0),
+            };
+        });
+
+        return balance;
+    }
+
 
     protected generateInputMap = (): InputElement[] => {
         const { txs = {} } = this.wdProvider.getData();
@@ -35,7 +81,10 @@ export class BalanceCalculator {
         }, []);
     };
 
-    protected calcUTXOBalance(wdBalance: Wallet.Entity.WDBalance): Wallet.Entity.WDBalance {
+
+    protected calcUTXOBalance(): Wallet.Entity.WDBalance {
+        const wdBalance = this.generateEmptyBalance();
+
         const { txs = {} } = this.wdProvider.getData();
         const inputMap = this.generateInputMap();
 
@@ -77,7 +126,10 @@ export class BalanceCalculator {
         return wdBalance;
     }
 
-    protected calcAddressBalance(wdBalance: Wallet.Entity.WDBalance): Wallet.Entity.WDBalance {
+
+    protected calcAddressBalance(): Wallet.Entity.WDBalance {
+        const wdBalance = this.generateEmptyBalance();
+
         const { txs = {} } = this.wdProvider.getData();
 
         each(txs, (tx: Wallet.Entity.EtherTransaction) => {
@@ -85,7 +137,7 @@ export class BalanceCalculator {
 
             const txGas = new BigNumber(tx.gasUsed ? tx.gasUsed : tx.gasLimit).times(tx.gasPrice);
 
-            const confirmed = !!tx.blockHeight;
+            const confirmed = Boolean(tx.blockHeight);
 
             let toAddr = wdBalance.addrBalances[tx.to];
             let fromAddr = wdBalance.addrBalances[tx.from];
@@ -118,43 +170,5 @@ export class BalanceCalculator {
         });
 
         return wdBalance;
-    }
-
-    public calc(): Wallet.Entity.WDBalance {
-        const balance: Wallet.Entity.WDBalance = {
-            addrBalances: {},
-            txBalances: {},
-            utxo: [],
-        };
-
-        const { addresses, txs } = this.wdProvider.getData();
-
-        each(addresses, (addr: Wallet.Entity.WalletAddress) => {
-            const normalizedAddress = this.coin.getKeyFormat().parseAddress(addr.address).toString();
-            balance.addrBalances[normalizedAddress] = {
-                receive: new BigNumber(0),
-                spend: new BigNumber(0),
-                unconfirmed: new BigNumber(0),
-            };
-        });
-
-        each(txs, (tx: Wallet.Entity.WalletTransaction) => {
-            balance.txBalances[tx.txid] = {
-                receive: new BigNumber(0),
-                spend: new BigNumber(0),
-            };
-        });
-
-        switch (this.coin.getBalanceScheme()) {
-            case Coin.BalanceScheme.UTXO: {
-                return this.calcUTXOBalance(balance);
-            }
-
-            case Coin.BalanceScheme.ADDRESS_BALANCE: {
-                return this.calcAddressBalance(balance);
-            }
-        }
-
-        throw new Error('Not implement balance scheme');
     }
 }

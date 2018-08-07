@@ -1,4 +1,4 @@
-import {NodeInterface} from "./Node";
+import { NodeInterface } from './Node';
 
 const PURPOSE = 44;
 
@@ -17,12 +17,12 @@ export class Helper {
     }
 
     static getAccountHDPath(coinType: number,
-                            accountIndex: number) : string {
+                            accountIndex: number): string {
         return `m/${PURPOSE}'/${coinType}'/${accountIndex}'`;
     }
 
     static getHDPathFromAccount(addressType: AddressType = AddressType.RECEIVE,
-                                index: number = 0) : string {
+                                index: number = 0): string {
         return `m/${addressType}/${index}`;
     }
 }

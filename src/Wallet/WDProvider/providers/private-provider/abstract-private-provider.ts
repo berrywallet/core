@@ -4,9 +4,9 @@ import {Coin, HD} from "../../../../";
 import * as Entity from "../../../Entity";
 import SimpleProvider from "../SimpleProvider";
 import * as Provider from "../../";
-import {PrivateProviderInterface} from "./";
+import {IPrivateProvider} from "./";
 
-export abstract class AbstractPrivateProvider extends SimpleProvider implements PrivateProviderInterface {
+export abstract class AbstractPrivateProvider extends SimpleProvider implements IPrivateProvider {
 
     protected readonly seed: Buffer;
     protected readonly privateCoin: Coin.Private.MasterNodeInterface;

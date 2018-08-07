@@ -1,24 +1,24 @@
 import BigNumber from 'bignumber.js';
-import { Dictionary, List } from 'lodash';
+import { Dictionary } from 'lodash';
 import { Coin, HD } from '../../';
 
-interface Block {
+type Block = {
     hash: string;
     height: number;
     time: number;
     txids: string[];
     original?: any;
-}
+};
 
 
-interface WalletAddress {
+type WalletAddress = {
     address: string;
     type: HD.BIP44.AddressType;
     index: number;
-}
+};
 
 
-interface WalletTransaction {
+type WalletTransaction = {
     txid: string;
     coin: Coin.Unit;
     blockHash?: string;
@@ -26,26 +26,26 @@ interface WalletTransaction {
     blockTime?: number;         // Unix Timestamp
     receiveTime?: number;
     scheme: Coin.TransactionScheme;
-}
+};
 
 
-interface BIPInput {
+type BIPInput = {
     prevTxid: string;
     sequence: number;
     scriptSig: string;
     prevOutIndex: number;
-}
+};
 
 
-interface BIPOutput {
+type BIPOutput = {
     value: string;
     scriptPubKey: string;
     addresses?: string[];    // @TODO Need find why there is used an Array instead of primitive
     scriptType?: string;     // @TODO Need declare specific script types
-}
+};
 
 
-interface BIPTransaction extends WalletTransaction {
+type BIPTransaction = WalletTransaction & {
     inputs: BIPInput[];
     outputs: BIPOutput[];
     version: number;
@@ -53,7 +53,7 @@ interface BIPTransaction extends WalletTransaction {
 }
 
 
-interface EtherTransaction extends WalletTransaction {
+type EtherTransaction = WalletTransaction & {
     from: string;
     to: string;
     value: string;
@@ -69,34 +69,34 @@ interface EtherTransaction extends WalletTransaction {
 }
 
 
-interface WalletData {
+type WalletData = {
     coin: Coin.Unit;
     txs: Dictionary<WalletTransaction>;
     addresses: WalletAddress[];
-}
+};
 
 
-interface UnspentTXOutput {
+type UnspentTXOutput = {
     txid: string;
     addresses: string[];
     index: number;
     value: BigNumber;
     confirmed: boolean;
-}
+};
 
 
-interface Balance {
+type Balance = {
     receive: BigNumber;
     spend: BigNumber;
     unconfirmed?: BigNumber;
-}
+};
 
 
-interface WDBalance {
+type WDBalance = {
     addrBalances: Dictionary<Balance>;
     txBalances: Dictionary<Balance>;
     utxo: UnspentTXOutput[];
-}
+};
 
 
 export {
