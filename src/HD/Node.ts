@@ -1,4 +1,4 @@
-import WIF from 'wif';
+import * as WIF from 'wif';
 import * as BigInteger from 'bigi';
 import { HDNode, ECPair } from 'bitcoinjs-lib';
 

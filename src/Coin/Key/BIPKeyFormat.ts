@@ -1,8 +1,8 @@
 import * as BitcoinJS from 'bitcoinjs-lib';
+import * as WIF from 'wif';
 import * as Key from './';
 import * as Utils from '../../Utils';
 import { BIPCoinOptions } from '../Options';
-import WIF from 'wif';
 
 export class BIPKeyFormat implements Key.FormatInterface {
 
