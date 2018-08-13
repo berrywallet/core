@@ -1,6 +1,6 @@
-import {Constants, Coin} from "../../";
-import {Network} from "bitcoinjs-lib";
-import {BIPGenericCoin} from "../BIPGenericCoin";
+import { Constants, Coin } from "../../";
+import { Network } from "bitcoinjs-lib";
+import { BIPGenericCoin } from "../BIPGenericCoin";
 import BigNumber from "bignumber.js";
 
 export default class BitcoinTestnet extends BIPGenericCoin {
@@ -25,12 +25,12 @@ export default class BitcoinTestnet extends BIPGenericCoin {
         return {
             bip32: {
                 "public": 0x043587cf,
-                "private": 0x04358394
+                "private": 0x04358394,
             },
             messagePrefix: '\x19Bitcoin Signed Message:\n',
             pubKeyHash: 0x6f,
             scriptHash: 0xc4,
-            wif: 0xef
+            wif: 0xef,
         };
     }
 

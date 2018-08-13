@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { Network } from 'bitcoinjs-lib';
+import BitcoinJS  from 'bitcoinjs-lib';
 import { Constants, Coin } from '../../';
 import { BIPGenericCoin } from '../BIPGenericCoin';
 
@@ -21,7 +21,7 @@ export default class Bitcoin extends BIPGenericCoin {
         return 0;
     }
 
-    public networkInfo(): Network {
+    public networkInfo(): BitcoinJS.Network {
         return {
             bip32: {
                 "public": 0x0488b21e,

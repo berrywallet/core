@@ -1,4 +1,4 @@
-import BitcoinJS from 'bitcoinjs-lib';
+import * as BitcoinJS from 'bitcoinjs-lib';
 import * as Key from './';
 import * as Utils from '../../Utils';
 import { BIPCoinOptions } from '../Options';

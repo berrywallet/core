@@ -1,5 +1,5 @@
 import BigNumber from 'bignumber.js';
-import { Network } from 'bitcoinjs-lib';
+import BitcoinJS  from 'bitcoinjs-lib';
 import * as Coin from './';
 import { SATOSHI_PER_COIN } from '../Constants';
 
@@ -63,7 +63,7 @@ export abstract class BIPGenericCoin implements Coin.CoinInterface {
 
     public abstract getHDCoinType(): number;
 
-    public abstract networkInfo(): Network;
+    public abstract networkInfo(): BitcoinJS.Network;
 
     public abstract isSegWitAvailable(): boolean;
 
