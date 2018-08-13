@@ -1,4 +1,4 @@
-import {IEthereumNetworkClient, INetworkClient, NetworkClient, GasPrice} from "./NetworkClient";
+import { IEthereumNetworkClient, INetworkClient, NetworkClient, GasPrice } from "./NetworkClient";
 
 import InsightNetworkClient from "./InsightNetworkClient";
 import InfuraNetworkClient from "./InfuraNetworkClient";
@@ -17,5 +17,5 @@ export {
     InsightNetworkClient,
     BlockcypherBIPNetworkClient,
     EtherscanNetworkClient,
-    InfuraNetworkClient
-}
+    InfuraNetworkClient,
+};

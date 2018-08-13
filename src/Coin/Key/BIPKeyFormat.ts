@@ -1,18 +1,20 @@
-import * as Key from "./";
-import * as BitcoinJS from "bitcoinjs-lib";
-import * as Utils from "../../Utils";
-import {BIPCoinOptions} from "../Options";
-
-const WIF = require('wif');
+import BitcoinJS from 'bitcoinjs-lib';
+import * as Key from './';
+import * as Utils from '../../Utils';
+import { BIPCoinOptions } from '../Options';
+import WIF from 'wif';
 
 export class BIPKeyFormat implements Key.FormatInterface {
 
-    constructor(private readonly network: BitcoinJS.Network,
-                private readonly options: BIPCoinOptions) {
+    private readonly network: BitcoinJS.Network;
+    private readonly options: BIPCoinOptions;
 
+    public constructor(network: BitcoinJS.Network, options: BIPCoinOptions) {
+        this.network = network;
+        this.options = options;
     }
 
-    isValidAddress(address: string): boolean {
+    public isValidAddress(address: string): boolean {
         try {
             this.parseAddress(address);
             return true;
@@ -21,11 +23,11 @@ export class BIPKeyFormat implements Key.FormatInterface {
         }
     }
 
-    isValidPublicKey(publicKey: string): boolean {
+    public isValidPublicKey(publicKey: string): boolean {
         return Utils.isHexValid(publicKey, 33, 0);
     }
 
-    isValidPrivateKey(privateKey: string): boolean {
+    public isValidPrivateKey(privateKey: string): boolean {
         try {
             this.parsePrivateKey(privateKey);
             return true;
@@ -34,7 +36,7 @@ export class BIPKeyFormat implements Key.FormatInterface {
         }
     }
 
-    parseAddress(address: string): Key.Address {
+    public parseAddress(address: string): Key.Address {
         let addr: any;
         try {
             addr = BitcoinJS.address.fromBase58Check(address);
@@ -49,7 +51,7 @@ export class BIPKeyFormat implements Key.FormatInterface {
         return new Key.Address(addr.version, addr.hash, this);
     }
 
-    parsePublicKey(publicKey: string): Key.Public {
+    public parsePublicKey(publicKey: string): Key.Public {
         if (!this.isValidPublicKey(publicKey)) {
             throw new TypeError(`Public key ${publicKey} is not valid`);
         }
@@ -58,7 +60,7 @@ export class BIPKeyFormat implements Key.FormatInterface {
         return new Key.Public(buf, this);
     }
 
-    parsePrivateKey(privateKey: string): Key.Private {
+    public parsePrivateKey(privateKey: string): Key.Private {
         let wif: any;
         try {
             wif = WIF.decode(privateKey);
@@ -73,14 +75,14 @@ export class BIPKeyFormat implements Key.FormatInterface {
         return new Key.Private(wif.privateKey, this);
     }
 
-    publicToAddress(publicKey: Key.Public): Key.Address {
+    public publicToAddress(publicKey: Key.Public): Key.Address {
         let version, address;
         if (this.options.useSegWit) {
             version = this.network.scriptHash;
             let witnessScript = BitcoinJS.script.witnessPubKeyHash.output.encode(Utils.Crypto.hash160(publicKey.toBuffer()));
             let scriptPubKey = BitcoinJS.script.scriptHash.output.encode(Utils.Crypto.hash160(witnessScript));
             let addressStr = BitcoinJS.address.fromOutputScript(scriptPubKey) as any;
-            address = BitcoinJS.address.fromBase58Check(addressStr).hash
+            address = BitcoinJS.address.fromBase58Check(addressStr).hash;
         } else {
             version = this.network.pubKeyHash;
             address = Utils.Crypto.hash160(publicKey.toBuffer());
@@ -89,15 +91,15 @@ export class BIPKeyFormat implements Key.FormatInterface {
         return new Key.Address(version, address, this);
     }
 
-    formatAddress(version: number, buffer: Buffer, options?: any): string {
+    public formatAddress(version: number, buffer: Buffer, options?: any): string {
         return BitcoinJS.address.toBase58Check(buffer, version);
     }
 
-    formatPublicKey(buffer: Buffer, options?: any): string {
+    public formatPublicKey(buffer: Buffer, options?: any): string {
         return buffer.toString('hex');
     }
 
-    formatPrivateKey(buffer: Buffer, options?: any): string {
+    public formatPrivateKey(buffer: Buffer, options?: any): string {
         let compressed = options && options.compressed ? options.compressed : true;
 
         return WIF.encode(this.network.wif, buffer, compressed);

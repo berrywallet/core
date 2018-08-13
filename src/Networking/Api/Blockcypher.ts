@@ -1,9 +1,9 @@
-import {each} from 'lodash';
-import BigNumber from "bignumber.js";
-import {Coin, Constants, Wallet} from "../../";
-import {Blockcypher} from "./";
+import { forEach } from 'lodash';
+import BigNumber from 'bignumber.js';
+import { Coin, Constants, Wallet } from '../../';
+import { Blockcypher } from './';
 
-interface Network {
+export type Network = {
     name: string;
     height: number;
     hash: string;
@@ -18,9 +18,9 @@ interface Network {
     low_fee_per_kb: number;
     last_fork_height?: number;
     last_fork_hash?: string;
-}
+};
 
-interface Block {
+export type Block = {
     /**
      * The hash of the block; in Bitcoin,
      * the hashing function is SHA256(SHA256(block))
@@ -63,9 +63,9 @@ interface Block {
     txids: string[];
     prev_block_url: string;
     tx_url: string;
-}
+};
 
-interface Input {
+export type Input = {
     prev_hash: string;
     output_index: number;
     script: string;
@@ -73,17 +73,17 @@ interface Input {
     sequence: number;
     addresses: string[];
     script_type: string;
-}
+};
 
-interface Output {
+export type Output = {
     value: number;
     script: string;
     spent_by: string;
     addresses: string[];
     script_type: string;
-}
+};
 
-interface Transaction {
+export type Transaction = {
     block_hash: string;
     block_height: number;
     hash: string;
@@ -105,9 +105,9 @@ interface Transaction {
     confidence: number;
     inputs: Input[];
     outputs: Output[];
-}
+};
 
-interface AddressInfo {
+export interface AddressInfo {
     address: string;
     total_received: number;
     total_sent: number;
@@ -121,7 +121,7 @@ interface AddressInfo {
     txs: Transaction[]
 }
 
-function toWalletTx(tx: Transaction, coin: Coin.CoinInterface): Wallet.Entity.BIPTransaction {
+export function toWalletTx(tx: Transaction, coin: Coin.CoinInterface): Wallet.Entity.BIPTransaction {
     const txData: Wallet.Entity.BIPTransaction = {
         coin: coin.getUnit(),
         txid: tx.hash,
@@ -131,10 +131,10 @@ function toWalletTx(tx: Transaction, coin: Coin.CoinInterface): Wallet.Entity.BI
         version: tx.ver,
         lockTime: tx.lock_time,
         inputs: [],
-        outputs: []
+        outputs: [],
     } as Wallet.Entity.BIPTransaction;
 
-    each(tx.inputs, (vin: Blockcypher.Input) => {
+    forEach(tx.inputs, (vin: Blockcypher.Input) => {
         txData.inputs.push({
             prevTxid: vin.prev_hash,
             prevOutIndex: vin.output_index,
@@ -143,26 +143,14 @@ function toWalletTx(tx: Transaction, coin: Coin.CoinInterface): Wallet.Entity.BI
         });
     });
 
-    each(tx.outputs, (vout: Blockcypher.Output) => {
+    forEach(tx.outputs, (vout: Blockcypher.Output) => {
         txData.outputs.push({
             scriptPubKey: vout.script,
             scriptType: vout.script_type,
             addresses: vout.addresses,
-            value: new BigNumber(vout.value).div(Constants.SATOSHI_PER_COIN).toString()
+            value: new BigNumber(vout.value).div(Constants.SATOSHI_PER_COIN).toString(),
         });
     });
 
     return txData;
-}
-
-
-export {
-    Network,
-    Block,
-    Input,
-    Output,
-    Transaction,
-    AddressInfo,
-
-    toWalletTx
 }

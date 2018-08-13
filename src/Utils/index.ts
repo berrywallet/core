@@ -1,6 +1,6 @@
-import * as Crypto from "./Crypto";
-import BigNumber from "bignumber.js";
-import * as EthereumJsUtil from "ethereumjs-util";
+import * as Crypto from './Crypto';
+import BigNumber from 'bignumber.js';
+import * as EthereumJsUtil from 'ethereumjs-util';
 
 export function isHexPrefixed(hex: string): boolean {
     return hex.slice(0, 2) === '0x';
@@ -85,7 +85,7 @@ export function validateAmountValue(value: BigNumber, minValue: BigNumber, allow
 
 export function bigNumberToBuffer(value: BigNumber): Buffer {
     if (!value.isInteger()) {
-        throw new Error("Value must be integer")
+        throw new Error("Value must be integer");
     }
 
     return hexToBuffer(padHexToEven(value.toString(16)));
@@ -110,4 +110,4 @@ export function hexToBigNumber(hexNumber: string): BigNumber {
 }
 
 
-export {Crypto}
+export { Crypto };

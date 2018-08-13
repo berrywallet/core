@@ -8,11 +8,11 @@ import { NetworkProvider } from "./NetworkProvider";
 
 /**
  * @param {CoinInterface} coin
- * @param {AdapterPropsInterface} props
+ * @param {TAdapterProps} props
  *
  * @returns {NetworkClient}
  */
-function createClient(coin: Coin.CoinInterface, props: Api.AdapterPropsInterface): Clients.NetworkClient {
+function createClient(coin: Coin.CoinInterface, props: Api.TAdapterProps): Clients.NetworkClient {
     switch (props.type) {
         case Adapter.AdapterType.INSIGHT:
             return new Clients.InsightNetworkClient(coin, props.options);

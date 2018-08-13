@@ -1,9 +1,9 @@
-import { each, map } from 'lodash';
-import BigNumber from "bignumber.js";
-import Axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from "axios";
+import { forEach, map } from 'lodash';
+import BigNumber from 'bignumber.js';
+import Axios, { AxiosInstance, AxiosResponse, AxiosRequestConfig } from 'axios';
 
-import { Coin, Wallet, Constants, Utils } from "../../";
-import { AdapterOptionInterface, Infura, Etherscan } from '../Api';
+import { Coin, Wallet, Constants, Utils } from '../../';
+import { TAdapterOption, Infura, Etherscan } from '../Api';
 import { wrapLimiterMethod as infuraWrap } from '../Limmiters/Infura';
 import { wrapLimiterMethod as etherscanWrap } from '../Limmiters/Etherscan';
 import { wrapLimiterMethod as etherchainWrap } from '../Limmiters/Etherchain';
@@ -26,9 +26,9 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
      * Constructor of EtherscanNetworkClient.
      *
      * @param {CoinInterface} coin
-     * @param {AdapterOptionInterface} options
+     * @param {TAdapterOption} options
      */
-    constructor(coin: Coin.CoinInterface, options: AdapterOptionInterface) {
+    constructor(coin: Coin.CoinInterface, options: TAdapterOption) {
         super(coin, options);
 
         if (false === (coin instanceof Coin.Defined.Ethereum)) {
@@ -279,7 +279,7 @@ export default class InfuraNetworkClient extends NetworkClient implements IEther
     getAddressTxs(address: string): Promise<Wallet.Entity.EtherTransaction[]> {
         const onRequestSuccess = (response) => {
             const txList: Wallet.Entity.EtherTransaction[] = [];
-            each(response.result, (tx: Etherscan.Transaction) => {
+            forEach(response.result, (tx: Etherscan.Transaction) => {
                 const txData = Etherscan.toWalletTx(this.coin, tx);
                 txList.push(txData);
             });

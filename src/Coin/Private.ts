@@ -1,5 +1,5 @@
-import * as Coin from "."
-import * as HD from "../HD"
+import * as Coin from ".";
+import * as HD from "../HD";
 
 export interface NodeInterface {
     getNode(): HD.Node.NodeInterface;
@@ -69,7 +69,7 @@ export class BasicMasterNode extends BasicNode implements MasterNodeInterface {
     deriveAddress(addressType: HD.BIP44.AddressType = HD.BIP44.AddressType.RECEIVE,
                   index: number = 0,
                   accountIndex: number = 0): BasicNode {
-        if(!(accountIndex in this.accountNodeCache)) {
+        if (!(accountIndex in this.accountNodeCache)) {
             let accountPath = HD.BIP44.Helper.getAccountHDPath(this.getCoin().getHDCoinType(), accountIndex);
             this.accountNodeCache[accountIndex] = this.derivePath(accountPath);
         }

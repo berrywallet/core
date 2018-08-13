@@ -1,10 +1,8 @@
-import {EtherTransaction} from "./Wallet/Entity";
+import { forEach } from 'lodash';
+import BIP39 from 'bip39';
+import BigNumber from 'bignumber.js';
 
-const BIP39 = require('bip39');
-import BigNumber from "bignumber.js";
-import {each} from 'lodash';
-
-import {Coin, Wallet, Networking, HD, Utils} from './';
+import { Coin, Wallet } from './';
 
 const coins = [
     // {
@@ -17,7 +15,7 @@ const coins = [
     // },
     {
         coin: Coin.makeCoin(Coin.Unit.BTCt),
-        address: 'mm5GgtNrzXKE7y8LZhtdvX6uhuTmWL12eZ'
+        address: 'mm5GgtNrzXKE7y8LZhtdvX6uhuTmWL12eZ',
     },
     // {
     //     coin: Coin.makeCoin(Coin.Unit.DASH),
@@ -64,23 +62,23 @@ function onWdCreated(wdProvider: Wallet.Provider.WDProvider) {
         });
     };
 
-    each(wdProvider.address.list(), (addr: Wallet.Entity.WalletAddress) => {
+    forEach(wdProvider.address.list(), (addr: Wallet.Entity.WalletAddress) => {
         console.log(
             "Address: %s / Index: %s / Type: %s",
             addr.address,
             addr.index,
-            addr.type
+            addr.type,
         );
     });
 
     console.log('Addrs: ');
-    each(balance.addrBalances, (balance: Wallet.Entity.Balance, addr: string) => {
+    forEach(balance.addrBalances, (balance: Wallet.Entity.Balance, addr: string) => {
         console.log(
             `${addr}: ${balance.receive.toNumber()} > ${balance.unconfirmed.toNumber()} > ${balance.receive.minus(balance.spend).minus(balance.unconfirmed).toNumber()}`);
     });
     console.log('');
     console.log('Txs: ');
-    each(balance.txBalances, (balance: Wallet.Entity.Balance, txid: string) => {
+    forEach(balance.txBalances, (balance: Wallet.Entity.Balance, txid: string) => {
         console.log(`${txid}: ${balance.receive.toNumber()} - ${balance.spend.toNumber()}`);
     });
     console.log('');
@@ -123,7 +121,7 @@ function onWdCreated(wdProvider: Wallet.Provider.WDProvider) {
             .calculateFee(
                 new BigNumber(0.5),
                 this.coinInfo.coin.getKeyFormat().parseAddress(this.coinInfo.address),
-                Coin.FeeTypes.Low
+                Coin.FeeTypes.Low,
             )
             .then(resolveFee)
             .catch(error => {
@@ -143,5 +141,5 @@ coins.forEach((coinInfo) => {
     const walletGenerator = Wallet.Generator.createGenerator(coinInfo.coin, bufferSeed);
     walletGenerator
         .fill()
-        .then(onWdCreated.bind({coinInfo}));
+        .then(onWdCreated.bind({ coinInfo }));
 });

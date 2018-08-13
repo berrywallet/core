@@ -2,10 +2,10 @@ import { map, find } from 'lodash';
 import { EventEmitter } from 'events';
 import { Wallet, Debug } from '../../../';
 import { Destructable } from '../../../Utils/Destructable';
-import { Events } from "../../";
-import { INetworkClient } from "../";
+import { Events } from '../../';
+import { INetworkClient } from '../';
 
-enum TrackerEvent {
+export enum TrackerEvent {
     Connect = 'connect',
     Disconnect = 'disconnect',
     ConnectionError = 'connection_error',
@@ -14,7 +14,7 @@ enum TrackerEvent {
     Tx = 'tx'
 }
 
-interface ITrackerClient extends Destructable, EventEmitter {
+export interface ITrackerClient extends Destructable, EventEmitter {
     onConnect(callback): ITrackerClient;
 
     onBlock(callback: Events.NewBlockCallback): ITrackerClient;
@@ -30,13 +30,13 @@ interface ITrackerClient extends Destructable, EventEmitter {
     isAddrTrack(addr: string | Buffer): boolean;
 }
 
-interface IAddressTrackEvent {
+export interface IAddressTrackEvent {
     addrs: Buffer[];
     callback?: Events.NewTxCallback;
 }
 
 
-class TrackerClient<T extends INetworkClient> extends EventEmitter implements ITrackerClient {
+export class TrackerClient<T extends INetworkClient> extends EventEmitter implements ITrackerClient {
     protected debug;
     protected readonly networkClient: T;
     protected addrTxEvents: IAddressTrackEvent = {
@@ -200,10 +200,3 @@ class TrackerClient<T extends INetworkClient> extends EventEmitter implements IT
         this.removeAllListeners('addr.*');
     }
 }
-
-export {
-    TrackerEvent,
-    IAddressTrackEvent,
-    ITrackerClient,
-    TrackerClient,
-};

@@ -1,4 +1,4 @@
-import { each, chain, Dictionary } from 'lodash';
+import { forEach, chain, Dictionary } from 'lodash';
 import BigNumber from 'bignumber.js';
 import { Coin, Constants, HD } from '../../../../';
 import { Entity } from '../../../';
@@ -164,7 +164,7 @@ export class BIPPrivateProvider extends AbstractPrivateProvider {
             throw new Error('Insufficient funds');
         }
 
-        each(inputs, (inp) => {
+        forEach(inputs, (inp) => {
             txBuilder.addInput(inp.txId, inp.vout);
             const walletAddress = this.wdProvider.address.get(inp.address);
             if (!walletAddress) {
@@ -174,7 +174,7 @@ export class BIPPrivateProvider extends AbstractPrivateProvider {
             txPrivateKeys.push(this.deriveAddressNode(walletAddress).getPrivateKey());
         });
 
-        each(outputs, (out) => {
+        forEach(outputs, (out) => {
             let curAddress = out.address || null;
             if (!curAddress) {
                 curAddress = this.getPureChangeAddress(balance).address;

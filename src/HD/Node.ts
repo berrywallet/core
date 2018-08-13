@@ -1,9 +1,6 @@
+import WIF from 'wif';
 import * as BigInteger from 'bigi';
-import {HDNode, ECPair} from "bitcoinjs-lib";
-
-
-const WIF = require('wif');
-
+import { HDNode, ECPair } from 'bitcoinjs-lib';
 
 export interface NodeInterface {
 
@@ -21,35 +18,36 @@ export class BasicNode implements NodeInterface {
 
     private hdNode: HDNode;
 
-    constructor(pi: BigInteger, chainCode: Buffer) {
+    public constructor(pi: BigInteger, chainCode: Buffer) {
         this.hdNode = new HDNode(
-            new ECPair(pi, null, {compressed: true}),
-            chainCode
+            new ECPair(pi, null, { compressed: true }),
+            chainCode,
         );
     }
 
-    static fromBitcoinJsHDNode(hdNode: HDNode): BasicNode {
+    public static fromBitcoinJsHDNode(hdNode: HDNode): BasicNode {
         return new BasicNode((hdNode.keyPair as any).d, (hdNode as any).chainCode);
     }
 
-    static fromSeedBuffer(seed: Buffer): BasicNode {
+    public static fromSeedBuffer(seed: Buffer): BasicNode {
         return BasicNode.fromBitcoinJsHDNode(HDNode.fromSeedBuffer(seed));
     }
 
-    getECKeyPair(): ECPair {
+    public getECKeyPair(): ECPair {
         return this.hdNode.keyPair;
     }
 
-    getPublicKey(): Buffer {
-        return this.hdNode.getPublicKeyBuffer()
+    public getPublicKey(): Buffer {
+        return this.hdNode.getPublicKeyBuffer();
     }
 
-    getPrivateKey(): Buffer {
-        let wif: any = WIF.decode(this.hdNode.keyPair.toWIF());
+    public getPrivateKey(): Buffer {
+        let wif: WIF.WIF = WIF.decode(this.hdNode.keyPair.toWIF());
+
         return wif.privateKey;
     }
 
-    derive(index: number, hardened?: boolean): NodeInterface {
+    public derive(index: number, hardened?: boolean): NodeInterface {
         let derivedNode = hardened ?
             this.hdNode.deriveHardened(index) :
             this.hdNode.derive(index);
@@ -57,7 +55,7 @@ export class BasicNode implements NodeInterface {
         return BasicNode.fromBitcoinJsHDNode(derivedNode);
     }
 
-    derivePath(path: string): NodeInterface {
+    public derivePath(path: string): NodeInterface {
         let derivedNode = this.hdNode.derivePath(path);
 
         return BasicNode.fromBitcoinJsHDNode(derivedNode);

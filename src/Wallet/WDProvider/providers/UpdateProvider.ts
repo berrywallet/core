@@ -1,6 +1,6 @@
 import { Provider } from '../../';
 
-import { map, each, chunk } from 'lodash';
+import { map, forEach, chunk } from 'lodash';
 import { Wallet } from '../../../';
 import SimpleProvider from './SimpleProvider';
 
@@ -15,7 +15,7 @@ export default class UpdateProvider extends SimpleProvider {
 
         const txs: Wallet.Entity.WalletTransaction[] = await networkProvider.getBulkAddrTxs(rawAddrs);
 
-        each(txs, (tx: Wallet.Entity.WalletTransaction) => {
+        forEach(txs, (tx: Wallet.Entity.WalletTransaction) => {
             this.wdProvider.tx.add(tx);
         });
     }

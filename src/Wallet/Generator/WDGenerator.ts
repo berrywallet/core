@@ -1,14 +1,10 @@
-import {each} from 'lodash';
-
+import { forEach } from 'lodash';
 import * as Coin from '../../Coin';
 import * as Wallet from '../../Wallet';
-
-
 
 export interface IWDGenerator {
     fill(): Promise<Wallet.Provider.WDProvider>;
 }
-
 
 export abstract class WDGenerator implements IWDGenerator {
 
@@ -24,7 +20,7 @@ export abstract class WDGenerator implements IWDGenerator {
     }
 
     protected resolveAddrsTxs(txs: Wallet.Entity.WalletTransaction[]) {
-        each(txs, (tx: Wallet.Entity.WalletTransaction) => this.wdProvider.tx.add(tx));
+        forEach(txs, (tx: Wallet.Entity.WalletTransaction) => this.wdProvider.tx.add(tx));
     };
 
     abstract fill(): Promise<Wallet.Provider.WDProvider>;

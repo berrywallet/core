@@ -1,16 +1,15 @@
-import { filter, each } from 'lodash';
-
-import { Coin, Wallet, Utils, Debug } from '../';
+import { forEach } from 'lodash';
+import { Coin, Wallet, Debug } from '../';
 import * as Networking from './';
 import { Destructable } from '../Utils/Destructable';
 
-interface ClientUnit {
-    options: Networking.Api.AdapterOptionInterface;
+export interface ClientUnit {
+    options: Networking.Api.TAdapterOption;
     client: Networking.Clients.INetworkClient;
     banned: boolean;
 }
 
-interface NetworkProviderInterface extends Destructable {
+export interface NetworkProviderInterface extends Destructable {
 
     getClient(index: number): Networking.Clients.INetworkClient;
 
@@ -30,7 +29,7 @@ interface NetworkProviderInterface extends Destructable {
 }
 
 
-class NetworkProvider implements NetworkProviderInterface {
+export class NetworkProvider implements NetworkProviderInterface {
 
     protected clientList: ClientUnit[] = [];
     protected currentClientIndex = 0;
@@ -46,7 +45,7 @@ class NetworkProvider implements NetworkProviderInterface {
             throw new Error(`No providers for ${coin.getUnit()}`);
         }
 
-        each(clientOptions, (props: Networking.Api.AdapterPropsInterface, indx: number) => {
+        forEach(clientOptions, (props: Networking.Api.TAdapterProps, indx: number) => {
             const client = Networking.createClient(this.coin, props);
             this.clientList.push({
                 client: client,
@@ -140,10 +139,3 @@ class NetworkProvider implements NetworkProviderInterface {
         };
     };
 }
-
-
-export {
-    ClientUnit,
-    NetworkProviderInterface,
-    NetworkProvider,
-};

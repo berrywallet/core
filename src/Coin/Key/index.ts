@@ -1,20 +1,27 @@
-import {OptionsInterface} from "../Options";
-export {BIPKeyFormat} from "./BIPKeyFormat";
-export {EthereumKeyFormat} from './EthereumKeyFormat'
+import { OptionsInterface } from '../Options';
+
+export { BIPKeyFormat } from './BIPKeyFormat';
+export { EthereumKeyFormat } from './EthereumKeyFormat';
 
 export interface FormatInterface {
     isValidAddress(address: string): boolean;
+
     isValidPublicKey(publicKey: string): boolean;
+
     isValidPrivateKey(privateKey: string): boolean;
 
     parseAddress(address: string): Address;
+
     parsePublicKey(publicKey: string): Public;
+
     parsePrivateKey(privateKey: string): Private;
 
     publicToAddress(publicKey: Public): Address;
 
     formatAddress(version: number, buffer: Buffer, options?: any): string;
+
     formatPublicKey(buffer: Buffer, options?: any): string;
+
     formatPrivateKey(buffer: Buffer, options?: any): string;
 }
 
@@ -28,7 +35,7 @@ export class Address {
     }
 
     toBuffer(): Buffer {
-        return this.address
+        return this.address;
     }
 
     toString(options?: any): string {

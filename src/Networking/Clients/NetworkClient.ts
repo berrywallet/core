@@ -1,19 +1,20 @@
-import BigNumber from "bignumber.js";
-import { Dictionary, each, map, findIndex } from "lodash";
+import BigNumber from 'bignumber.js';
+import { Dictionary, forEach, map, findIndex } from 'lodash';
 import { Coin, Wallet } from '../../';
 import { Destructable } from '../../Utils/Destructable';
 import { Api, Events } from '../';
 import * as Tracker from './Tracker';
 
+export { Tracker };
 
-interface INetworkClient extends Destructable {
+export interface INetworkClient extends Destructable {
     getCoin(): Coin.CoinInterface;
 
     getApiUrl(): string;
 
     getWSUrl(): string;
 
-    getOptions(): Api.AdapterOptionInterface;
+    getOptions(): Api.TAdapterOption;
 
     getBlock(blockHash: string): Promise<Wallet.Entity.Block>;
 
@@ -28,26 +29,28 @@ interface INetworkClient extends Destructable {
     getTracker(): Tracker.ITrackerClient;
 }
 
-interface GasPrice {
+export type GasPrice = {
     low: BigNumber,
     standard: BigNumber,
     high: BigNumber
-}
+};
 
-interface IEthereumNetworkClient extends INetworkClient {
+export interface IEthereumNetworkClient extends INetworkClient {
     getGasPrice(): Promise<GasPrice>;
 
     estimateGas(address: Coin.Key.Address, value: BigNumber): Promise<BigNumber>;
 }
 
 
-abstract class NetworkClient implements INetworkClient {
-
+export abstract class NetworkClient implements INetworkClient {
+    protected readonly coin: Coin.CoinInterface;
+    protected readonly options: Api.TAdapterOption;
     protected onBlocksCbs: Events.NewBlockCallback[] = [];
     protected onAddrTXCbs: Dictionary<Events.NewTxCallback[]> = {};
 
-    constructor(protected readonly coin: Coin.CoinInterface,
-                protected readonly options: Api.AdapterOptionInterface) {
+    public constructor(coin: Coin.CoinInterface, options: Api.TAdapterOption) {
+        this.coin = coin;
+        this.options = options;
     }
 
     abstract getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | undefined>;
@@ -74,7 +77,7 @@ abstract class NetworkClient implements INetworkClient {
         return !!this.getWSUrl();
     }
 
-    public getOptions(): Api.AdapterOptionInterface {
+    public getOptions(): Api.TAdapterOption {
         return this.options;
     }
 
@@ -95,8 +98,8 @@ abstract class NetworkClient implements INetworkClient {
 
         const txList = [];
 
-        each(txChunks, (txs) => {
-            each(txs, (tx) => {
+        forEach(txChunks, (txs) => {
+            forEach(txs, (tx) => {
                 const indx = findIndex(txList, { txid: tx.txid } as any);
                 if (indx >= 0) {
                     txList[indx] = Object.assign(txList[indx], tx);
@@ -109,17 +112,8 @@ abstract class NetworkClient implements INetworkClient {
         return txList;
     }
 
-    destruct() {
+    public destruct() {
         this.onBlocksCbs = [];
         this.onAddrTXCbs = {};
     }
 }
-
-
-export {
-    Tracker,
-    INetworkClient,
-    GasPrice,
-    IEthereumNetworkClient,
-    NetworkClient,
-};

@@ -1,4 +1,4 @@
-import { each, map } from 'lodash';
+import { forEach, map } from 'lodash';
 import BigNumber from 'bignumber.js';
 import * as BitcoinJS from 'bitcoinjs-lib';
 
@@ -14,7 +14,7 @@ import { Provider, Entity, Exceptions } from './';
 export function calculateBalance(balance: Entity.WDBalance, withUnconfirmed = false): number {
     let totalBalance = new BigNumber(0);
 
-    each(balance.addrBalances, (b: Entity.Balance) => {
+    forEach(balance.addrBalances, (b: Entity.Balance) => {
         totalBalance = totalBalance.plus(b.receive).minus(b.spend);
 
         if (!withUnconfirmed) {

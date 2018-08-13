@@ -1,4 +1,4 @@
-import { each } from 'lodash';
+import { forEach } from 'lodash';
 
 import { Coin, Networking } from '../../';
 import { Entity } from '../';
@@ -60,7 +60,7 @@ export class WDProvider extends EventEmitter implements Destructable {
         const oldWd = { ...this.walletData };
         this.walletData = Object.assign({}, oldWd, newWDState);
 
-        each(this.eventListeners, (el) => {
+        forEach(this.eventListeners, (el) => {
             el(this.walletData, oldWd);
         });
     }

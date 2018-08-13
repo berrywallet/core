@@ -1,4 +1,4 @@
-import {AdapterType} from "../Adapter";
+import { AdapterType } from '../Adapter';
 
 import * as Blockcypher from './Blockcypher';
 import * as EthereumBlockcypher from './EthereumBlockcypher';
@@ -7,26 +7,17 @@ import * as Infura from './Infura';
 import * as Insight from './Insight';
 
 
-interface AdapterOptionInterface {
+export type TAdapterOption = {
     url: string;
     wsUrl?: string;
 
     [key: string]: any;
-}
+};
 
 
-interface AdapterPropsInterface {
+export type TAdapterProps = {
     type: AdapterType;
-    options: AdapterOptionInterface;
-}
+    options: TAdapterOption;
+};
 
-export {
-    AdapterOptionInterface,
-    AdapterPropsInterface,
-
-    Blockcypher,
-    EthereumBlockcypher,
-    Etherscan,
-    Infura,
-    Insight
-}
+export { Blockcypher, EthereumBlockcypher, Etherscan, Infura, Insight };

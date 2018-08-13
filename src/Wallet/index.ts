@@ -4,10 +4,4 @@ import * as Generator from './Generator';
 import * as Helper from './Helper';
 import * as Provider from './WDProvider';
 
-export {
-    Exceptions,
-    Entity,
-    Generator,
-    Provider,
-    Helper
-}
+export { Exceptions, Entity, Generator, Provider, Helper };

@@ -1,7 +1,7 @@
-import { AdapterPropsInterface } from "./Api";
+import { TAdapterProps } from "./Api";
 import * as Coin from "../Coin";
 
-enum AdapterType {
+export enum AdapterType {
     INSIGHT = 'insight',
     ETHERSCAN = 'etherscan',
     // a symbios of two explorer - infura and etherscan
@@ -10,7 +10,7 @@ enum AdapterType {
     BLOCKCYPHER_ETHER = 'blockcypher-ether'
 }
 
-const AdapterMap = [];
+export const AdapterMap = [];
 
 // Bitcoin
 AdapterMap[Coin.Unit.BTC] = [{
@@ -128,18 +128,10 @@ AdapterMap[Coin.Unit.ETHt] = [{
     },
 }];
 
-function getNetworkAdapter(coin: Coin.CoinInterface, index: number = 0): AdapterPropsInterface {
+export function getNetworkAdapter(coin: Coin.CoinInterface, index: number = 0): TAdapterProps {
     return AdapterMap[coin.getUnit()][index];
 }
 
-function getNetworkAdapters(coin: Coin.CoinInterface): AdapterPropsInterface[] {
+export function getNetworkAdapters(coin: Coin.CoinInterface): TAdapterProps[] {
     return AdapterMap[coin.getUnit()];
 }
-
-
-export {
-    AdapterType,
-    AdapterMap,
-    getNetworkAdapter,
-    getNetworkAdapters,
-};

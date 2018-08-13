@@ -1,4 +1,4 @@
-interface Transaction {
+export type Transaction = {
     tx_hash: string;
     block_height: number;
     tx_input_n: number;
@@ -8,9 +8,9 @@ interface Transaction {
     confirmations: number;
     confirmed: string; // DateTime
     double_spend: boolean;
-}
+};
 
-interface AddressInfo {
+export type AddressInfo = {
     address: string;
     total_received: number;
     total_sent: number
@@ -23,9 +23,4 @@ interface AddressInfo {
     txrefs: Transaction[];
     hasMore: boolean;
     tx_url: string;
-}
-
-export {
-    Transaction,
-    AddressInfo
-}
+};

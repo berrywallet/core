@@ -1,6 +1,6 @@
 const assert = require('assert');
 const _ = require('lodash');
-const Berrywallet = require('../dist');
+const Berrywallet = require('../dist/lib');
 
 const Coin = Berrywallet.Coin;
 // const Utils = Berrywallet.Utils;
@@ -22,11 +22,11 @@ _.each(coinsToTest, (testParams, coinUnit) => {
 
     const testCoin = () => {
         it('Success build', () => {
-            assert.equal(coinUnit, coin.getUnit(), `${coinUnit} not accepted ${coin.getUnit()}`);
+            assert.strictEqual(coinUnit, coin.getUnit(), `${coinUnit} not accepted ${coin.getUnit()}`);
         });
 
         it('Test MultiAddress', () => {
-            assert.equal(testParams[0], coin.isMultiAddressAccount());
+            assert.strictEqual(testParams[0], coin.isMultiAddressAccount());
         });
     };
 

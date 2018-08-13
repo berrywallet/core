@@ -1,4 +1,4 @@
-import { each, reduce, find } from 'lodash';
+import { forEach, reduce, find } from 'lodash';
 import { parse as urlParcer } from "url";
 import { Wallet, Debug } from '../../../';
 import { InsightNetworkClient } from '../';
@@ -118,7 +118,7 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
      * @param {Block} block
      */
     protected fireNewBlock(block: Wallet.Entity.Block): boolean {
-        each(block.txids, (txid) => {
+        forEach(block.txids, (txid) => {
             if (this.listenerCount('tx.' + txid) === 0) return;
 
             this.networkClient

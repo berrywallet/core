@@ -13,7 +13,8 @@
         "suppressImplicitAnyIndexErrors": true,
         "rootDir": "./src",
         "baseUrl": "./src",
-        "outDir": "./dist/",
+        "declarationDir": "dist/types",
+        "outDir": "dist/lib",
         "typeRoots": [
             "src/definitions",
             "node_modules/@types"
@@ -30,6 +31,7 @@
     ],
     "exclude": [
         "node_modules",
-        "**/*.spec.ts"
+        "**/*.spec.ts",
+        "**/__tests__/*"
     ]
 }

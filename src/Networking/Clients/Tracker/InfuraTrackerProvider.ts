@@ -1,4 +1,4 @@
-import { each } from 'lodash';
+import { forEach } from 'lodash';
 
 import { Wallet } from '../../../';
 import { Infura } from '../../Api';
@@ -69,7 +69,7 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
         const originalResponse: Infura.Block = block.original;
         if (originalResponse) {
             const { addrs = [], callback = null } = this.addrTxEvents;
-            each(originalResponse.transactions, (tx: Infura.Transaction) => {
+            forEach(originalResponse.transactions, (tx: Infura.Transaction) => {
 
                 if (this.isAddrTrack(tx.to) || this.isAddrTrack(tx.from)) {
                     if (callback) {

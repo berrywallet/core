@@ -1,4 +1,4 @@
-import { find, each, reduce, map } from 'lodash';
+import { find, forEach, reduce, map } from 'lodash';
 import BigNumber from 'bignumber.js';
 
 import * as Coin from '../../../Coin';
@@ -44,7 +44,7 @@ export class BalanceCalculator {
 
         const { addresses, txs } = this.wdProvider.getData();
 
-        each(addresses, (addr: Wallet.Entity.WalletAddress) => {
+        forEach(addresses, (addr: Wallet.Entity.WalletAddress) => {
             const normalizedAddress = this.coin.getKeyFormat().parseAddress(addr.address).toString();
             balance.addrBalances[normalizedAddress] = {
                 receive: new BigNumber(0),
@@ -53,7 +53,7 @@ export class BalanceCalculator {
             };
         });
 
-        each(txs, (tx: Wallet.Entity.WalletTransaction) => {
+        forEach(txs, (tx: Wallet.Entity.WalletTransaction) => {
             balance.txBalances[tx.txid] = {
                 receive: new BigNumber(0),
                 spend: new BigNumber(0),
@@ -88,8 +88,8 @@ export class BalanceCalculator {
         const { txs = {} } = this.wdProvider.getData();
         const inputMap = this.generateInputMap();
 
-        each(txs, (tx: Wallet.Entity.BIPTransaction) => {
-            each(tx.outputs, (out: Wallet.Entity.BIPOutput, index: number) => {
+        forEach(txs, (tx: Wallet.Entity.BIPTransaction) => {
+            forEach(tx.outputs, (out: Wallet.Entity.BIPOutput, index: number) => {
                 // @TODO Need review and change model of calculate addresses data
                 if (!(out.addresses[0] in wdBalance.addrBalances)) {
                     return;
@@ -132,7 +132,7 @@ export class BalanceCalculator {
 
         const { txs = {} } = this.wdProvider.getData();
 
-        each(txs, (tx: Wallet.Entity.EtherTransaction) => {
+        forEach(txs, (tx: Wallet.Entity.EtherTransaction) => {
             let txBalance = wdBalance.txBalances[tx.txid];
 
             const txGas = new BigNumber(tx.gasUsed ? tx.gasUsed : tx.gasLimit).times(tx.gasPrice);

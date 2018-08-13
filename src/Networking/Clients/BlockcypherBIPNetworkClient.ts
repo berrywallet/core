@@ -1,30 +1,25 @@
-import {each, map, orderBy} from 'lodash';
-import Axios, {AxiosError, AxiosInstance} from 'axios';
+import { forEach, orderBy } from 'lodash';
+import Axios, { AxiosError, AxiosInstance } from 'axios';
 
-import {Coin, Wallet, Constants} from "../../";
-import {WalletTransaction} from "../../Wallet/Entity";
-import {AdapterOptionInterface, Blockcypher} from '../Api';
-import {wrapLimiterMethod} from '../Limmiters/Blockcypher';
-import {NetworkClient} from './NetworkClient';
+import { Coin, Wallet } from '../../';
+import { WalletTransaction } from '../../Wallet/Entity';
+import { TAdapterOption, Blockcypher } from '../Api';
+import { wrapLimiterMethod } from '../Limmiters/Blockcypher';
+import { NetworkClient } from './NetworkClient';
 
 export default class BlockcypherBIPNetworkClient extends NetworkClient {
     protected client: AxiosInstance;
 
-    constructor(coin: Coin.CoinInterface, options: AdapterOptionInterface) {
+    constructor(coin: Coin.CoinInterface, options: TAdapterOption) {
         super(coin, options);
 
         this.client = Axios.create({
             baseURL: this.getApiUrl(),
-            timeout: 10000
+            timeout: 10000,
         });
     }
 
-
-    /**
-     * @param {string} txid
-     * @returns {WalletTransaction}
-     */
-    getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null> {
+    public getTx(txid: string): Promise<Wallet.Entity.WalletTransaction | null> {
         const onRequestSuccess = (response) => {
             const tx: Blockcypher.Transaction = response.data;
 
@@ -48,22 +43,14 @@ export default class BlockcypherBIPNetworkClient extends NetworkClient {
     }
 
 
-    /**
-     * @param {string} blockHash
-     * @returns {Block}
-     */
-    getBlock(blockHash: string): Promise<Wallet.Entity.Block> {
+    public getBlock(blockHash: string): Promise<Wallet.Entity.Block> {
         throw new Error('Must be implement');
     }
 
 
-    /**
-     * @param {Transaction} transaction
-     * @returns {Promise<string>}
-     */
-    broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
+    public broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
         const requestData = {
-            tx: transaction.toBuffer().toString('hex')
+            tx: transaction.toBuffer().toString('hex'),
         };
 
         const onSuccess = (response) => {
@@ -80,12 +67,7 @@ export default class BlockcypherBIPNetworkClient extends NetworkClient {
     }
 
 
-    /**
-     * @param {string} address
-     *
-     * @returns {Promise<BIPTransaction[]>}
-     */
-    getAddressTxs(address: string): Promise<Wallet.Entity.BIPTransaction[]> {
+    public getAddressTxs(address: string): Promise<Wallet.Entity.BIPTransaction[]> {
         const onRequestSuccess = (response) => {
             const addressData: Blockcypher.AddressInfo = response.data;
 
@@ -94,7 +76,7 @@ export default class BlockcypherBIPNetworkClient extends NetworkClient {
                 txList.push(Blockcypher.toWalletTx(tx, this.coin));
             };
 
-            each(orderBy(addressData.txs, 'block_height', 'asc'), extractTxCallback);
+            forEach(orderBy(addressData.txs, 'block_height', 'asc'), extractTxCallback);
 
             return txList;
         };

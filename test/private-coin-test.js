@@ -1,5 +1,5 @@
-const BitcoinJS = require("bitcoinjs-lib");
-const Berrywallet = require('../dist');
+const BitcoinJS = require('bitcoinjs-lib');
+const Berrywallet = require('../dist/lib');
 const BIP39 = require('bip39');
 const mnemonicSeed = 'flag output rich laptop hub lift list scout enjoy topic sister lab';
 

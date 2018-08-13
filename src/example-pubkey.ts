@@ -1,7 +1,5 @@
-import {each} from 'lodash';
-import {Events} from "./Networking";
-import InfuraNetworkClient from "./Networking/Clients/InfuraNetworkClient";
-import {Coin, Networking, Wallet, Debug} from './';
+import { Coin, Networking, Debug } from './';
+
 const BIP39 = require('bip39');
 
 const debug = Debug.create('test-pubkey');
@@ -18,5 +16,3 @@ for (i; i < 20; i++) {
     const addr = privateCoin.derive(i);
     debug("Address %s", addr.getAddress().toString());
 }
-
-// coin.getKeyFormat().parseAddress("QXbvdsYvEQvngyKxf4enF8EAJepfyuESVd");

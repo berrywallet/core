@@ -1,4 +1,4 @@
-const Berrywallet = require('../dist');
+const Berrywallet = require('../dist/lib');
 
 describe('Test existing modules', () => {
     it('HD', (done) => {

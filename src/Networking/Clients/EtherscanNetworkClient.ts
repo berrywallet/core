@@ -1,8 +1,8 @@
-import { each } from 'lodash';
-import BigNumber from "bignumber.js";
+import { forEach } from 'lodash';
+import BigNumber from 'bignumber.js';
 
-import { Coin, Wallet, Constants } from "../../";
-import { AdapterOptionInterface, Etherscan } from '../Api';
+import { Coin, Wallet, Constants } from '../../';
+import { TAdapterOption, Etherscan } from '../Api';
 import { NetworkClient, IEthereumNetworkClient, GasPrice } from './NetworkClient';
 
 const EtherscanApi = require('etherscan-api');
@@ -14,9 +14,9 @@ export default class EtherscanNetworkClient extends NetworkClient implements IEt
      * Constructor of EtherscanNetworkClient.
      *
      * @param {CoinInterface} coin
-     * @param {AdapterOptionInterface} options
+     * @param {TAdapterOption} options
      */
-    public constructor(coin: Coin.CoinInterface, options: AdapterOptionInterface) {
+    public constructor(coin: Coin.CoinInterface, options: TAdapterOption) {
         super(coin, options);
 
         if (false === (coin instanceof Coin.Defined.Ethereum)) {
@@ -121,7 +121,7 @@ export default class EtherscanNetworkClient extends NetworkClient implements IEt
 
         const txList: Wallet.Entity.EtherTransaction[] = [];
 
-        each(response.result, (tx: Etherscan.Transaction) => {
+        forEach(response.result, (tx: Etherscan.Transaction) => {
 
             // @TODO Need review error of transaction
             if (+tx.isError) return;

@@ -1,7 +1,7 @@
-import {each, orderBy} from 'lodash';
-import {Coin, Constants, Wallet} from "../../";
-import BigNumber from "bignumber.js";
-import {Insight} from "./";
+import { forEach, orderBy } from 'lodash';
+import { Coin, Wallet } from '../../';
+import BigNumber from 'bignumber.js';
+import { Insight } from './';
 
 interface Network {
     info: {
@@ -109,10 +109,10 @@ function toWalletTx(tx: Transaction, coin: Coin.CoinInterface): Wallet.Entity.BI
         version: tx.version,
         lockTime: tx.locktime,
         inputs: [],
-        outputs: []
+        outputs: [],
     } as Wallet.Entity.BIPTransaction;
 
-    each(orderBy(tx.vin, 'n', 'asc'), (vin: Insight.Input) => {
+    forEach(orderBy(tx.vin, 'n', 'asc'), (vin: Insight.Input) => {
         if (!vin.txid) return;
 
         txData.inputs.push({
@@ -123,7 +123,7 @@ function toWalletTx(tx: Transaction, coin: Coin.CoinInterface): Wallet.Entity.BI
         });
     });
 
-    each(orderBy(tx.vout, 'n', 'asc'), (vout: Insight.Output) => {
+    forEach(orderBy(tx.vout, 'n', 'asc'), (vout: Insight.Output) => {
         const spk = vout.scriptPubKey;
         if (!spk.addresses) return;
 
@@ -131,7 +131,7 @@ function toWalletTx(tx: Transaction, coin: Coin.CoinInterface): Wallet.Entity.BI
             scriptPubKey: spk.hex,
             scriptType: spk.type,
             addresses: spk.addresses,
-            value: new BigNumber(vout.value).toString(10)
+            value: new BigNumber(vout.value).toString(10),
         });
     });
 
@@ -146,5 +146,5 @@ export {
     Block,
     AddressInfo,
 
-    toWalletTx
-}
+    toWalletTx,
+};
