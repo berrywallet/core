@@ -38,7 +38,7 @@ export class InfuraNetworkClient extends NetworkClient implements IEthereumNetwo
         });
 
         this.etherchainClient = Axios.create({
-            baseURL: "https://www.etherchain.org/api",
+            baseURL: 'https://www.etherchain.org/api',
             timeout: 10000,
         });
 
@@ -56,8 +56,8 @@ export class InfuraNetworkClient extends NetworkClient implements IEthereumNetwo
                     return Utils.numberToHex(elem);
                 }
 
-                if (elem instanceof Buffer) {
-                    return Utils.addHexPrefix(elem.toString('hex'));
+                if (Buffer.isBuffer(elem)) {
+                    return Utils.addHexPrefix((elem as Buffer).toString('hex'));
                 }
 
                 return elem;
@@ -84,51 +84,49 @@ export class InfuraNetworkClient extends NetworkClient implements IEthereumNetwo
             };
         }
 
-        const handleResponse = (response: AxiosResponse) => {
-            return response.data;
-        };
+        return infuraWrap(async () => {
+            const response = await this.client.request(requestConfig);
 
-        return infuraWrap(() => {
-            return this.client.request(requestConfig).then(handleResponse);
+            return response.data;
         });
     }
 
 
-    public getTx(txid: string): Promise<Wallet.Entity.EtherTransaction | undefined> {
-        const onRequestSuccess = (response: Infura.JsonRPCResponse) => {
-            const tx: Infura.Transaction = response.result;
-            if (!tx) return null;
+    public async getTx(txid: string): Promise<Wallet.Entity.EtherTransaction | undefined> {
 
-            const responseTx = {
-                coin: this.coin.getUnit(),
-                txid: tx.hash,
-                scheme: Coin.TransactionScheme.FROM_TO,
-                value: new BigNumber(tx.value).div(Constants.WEI_PER_COIN).toString(),
-                gasPrice: new BigNumber(tx.gasPrice).div(Constants.WEI_PER_COIN).toString(),
-                gasLimit: tx.gas,
-                to: tx.to,
-                from: tx.from,
-                data: tx.input,
-                nonce: new BigNumber(tx.nonce).toNumber(),
-            } as Wallet.Entity.EtherTransaction;
+        const response = await this.sendRequest('eth_getTransactionByHash', [txid]);
 
-            if (tx.blockNumber) {
-                return this.checkAndMapTxReceipt(responseTx);
-            }
+        const tx: Infura.Transaction = response.result;
+        if (!tx) return null;
 
-            return responseTx;
-        };
+        const responseTx = {
+            coin: this.coin.getUnit(),
+            txid: tx.hash,
+            scheme: Coin.TransactionScheme.FROM_TO,
+            value: new BigNumber(tx.value).div(Constants.WEI_PER_COIN).toString(),
+            gasPrice: new BigNumber(tx.gasPrice).div(Constants.WEI_PER_COIN).toString(),
+            gasLimit: tx.gas,
+            to: tx.to,
+            from: tx.from,
+            data: tx.input,
+            nonce: new BigNumber(tx.nonce).toNumber(),
+        } as Wallet.Entity.EtherTransaction;
 
-        return this.sendRequest('eth_getTransactionByHash', [txid]).then(onRequestSuccess);
+        if (tx.blockNumber) {
+            return this.checkAndMapTxReceipt(responseTx);
+        }
+
+        return responseTx;
     }
 
 
-    public getTxReceipt(txid: string): Promise<Infura.TransactionReceipt | undefined> {
-        const onRequestSuccess = (response: Infura.JsonRPCResponse) => {
-            return response.result as Infura.TransactionReceipt;
-        };
+    public async getTxReceipt(txid: string): Promise<Infura.TransactionReceipt | undefined> {
+        const response: Infura.JsonRPCResponse = await this.sendRequest(
+            'eth_getTransactionReceipt',
+            [txid],
+        );
 
-        return this.sendRequest('eth_getTransactionReceipt', [txid]).then(onRequestSuccess);
+        return response.result as Infura.TransactionReceipt;
     }
 
 
@@ -176,14 +174,15 @@ export class InfuraNetworkClient extends NetworkClient implements IEthereumNetwo
 
     public getGasPrice(): Promise<GasPrice> {
         const standardGasPrice = new BigNumber(4).div(Constants.WEI_PER_COIN);
-
         const defaultGasPrice = {
             low: standardGasPrice,
             standard: standardGasPrice,
             high: standardGasPrice,
         };
 
-        const handleResponse = (response: AxiosResponse) => {
+        return etherchainWrap(async () => {
+            const response: AxiosResponse = await this.etherchainClient.get('/gasPriceOracle');
+
             const gasPrices = response.data;
 
             if (!gasPrices) {
@@ -195,68 +194,46 @@ export class InfuraNetworkClient extends NetworkClient implements IEthereumNetwo
                 standard: new BigNumber(gasPrices.standard),
                 high: new BigNumber(gasPrices.fast),
             } as GasPrice;
-        };
-
-        return etherchainWrap(() => {
-            return this.etherchainClient
-                .get("/gasPriceOracle")
-                .then(handleResponse);
         });
     }
 
 
     public estimateGas(address: Coin.Key.Address, value: BigNumber): Promise<BigNumber> {
         throw new Error('Can not get Value');
-
-        // const onRequestSuccess = (response) => {
-        //     return new BigNumber(response.result);
-        // };
-        //
-        // // @TODO Return something error from Server!
-        // return etherscanWrap(() => {
-        //     return this.etherscanClient
-        //         .proxy.eth_estimateGas(
-        //             address.toString().toLowerCase(),
-        //             value.times(Constants.WEI_PER_COIN).toNumber()
-        //         )
-        //         .then(onRequestSuccess);
-        // });
     }
 
 
-    public broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
-        return this
-            .sendRequest('eth_sendRawTransaction', [transaction.toBuffer()], true)
-            .then((data) => {
-                if (data.error) {
-                    throw new Error(data.error.message);
-                }
+    public async broadCastTransaction(transaction: Coin.Transaction.Transaction): Promise<string> {
+        const data = await this.sendRequest(
+            'eth_sendRawTransaction',
+            [transaction.toBuffer()],
+            true,
+        );
 
-                return data.result as string;
-            });
+        if (data.error) {
+            throw new Error(data.error.message);
+        }
+
+        return data.result as string;
     }
 
 
     public getAddressTxs(address: string): Promise<Wallet.Entity.EtherTransaction[]> {
-        const onRequestSuccess = (response) => {
-            const txList: Wallet.Entity.EtherTransaction[] = [];
-            forEach(response.result, (tx: Etherscan.Transaction) => {
-                const txData = Etherscan.toWalletTx(this.coin, tx);
-                txList.push(txData);
-            });
+        return etherscanWrap(async () => {
+            try {
+                const response = await this.etherscanClient.account
+                    .txlist(address.toLowerCase(), 1, 'latest', 'asc');
 
-            return txList;
-        };
+                const txList: Wallet.Entity.EtherTransaction[] = [];
+                forEach(response.result, (tx: Etherscan.Transaction) => {
+                    const txData = Etherscan.toWalletTx(this.coin, tx);
+                    txList.push(txData);
+                });
 
-        const onRequestError = () => {
-            return [];
-        };
-
-        return etherscanWrap(() => {
-            return this.etherscanClient
-                .account.txlist(address.toLowerCase(), 1, 'latest', 'asc')
-                .then(onRequestSuccess)
-                .catch(onRequestError);
+                return txList;
+            } catch (error) {
+                return [];
+            }
         });
     }
 

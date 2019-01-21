@@ -30,7 +30,6 @@ export function calculateTxBalance(balance: Entity.WDBalance, txid: string): num
 
     return txBalance.receive.minus(txBalance.spend).toNumber();
 }
-calculateTxBalance
 
 export function createWDProvider(walletData: Entity.WalletData): WDProvider {
     return new WDProvider(walletData);

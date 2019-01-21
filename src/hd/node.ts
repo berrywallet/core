@@ -16,6 +16,12 @@ export interface NodeInterface {
 
 export class BasicNode implements NodeInterface {
 
+    /**
+     * @deprecated
+     * @use BIP32 library insteadof BitcoinJS.HDNode to move BitcoinJS 4.0.0
+     *
+     * import bip32 from 'bip32';
+     **/
     private hdNode: HDNode;
 
     public constructor(pi: BigInteger, chainCode: Buffer) {

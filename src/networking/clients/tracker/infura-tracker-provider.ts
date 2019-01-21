@@ -18,9 +18,6 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
     protected connected: boolean = false;
     protected blockTrackInterval?: any;
 
-    /**
-     * @param {InfuraNetworkClient} networkClient
-     */
     public constructor(networkClient: InfuraNetworkClient) {
         super(networkClient);
 
@@ -59,9 +56,6 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
         }, NEW_BLOCK_CHECK_TIMEOUT);
     }
 
-    /**
-     * @param {Block} block
-     */
     protected fireNewBlock(block: Wallet.Entity.Block): boolean {
         this.currentBlockHeight = block.height;
         this.currentBlockTime = block.time;
@@ -91,17 +85,15 @@ export class InfuraTrackerProvider extends TrackerClient<InfuraNetworkClient> {
 
     protected getCurrentBlockTime(): number {
         return this.currentBlockTime || 0;
-    };
+    }
 
-    /**
-     * @param {WalletTransaction} tx
-     */
-    protected fireTxidConfirmation(tx: Wallet.Entity.EtherTransaction): boolean {
-        this.networkClient
-            .checkAndMapTxReceipt(tx)
-            .then(rtx => super.fireTxidConfirmation(rtx));
+    protected async fireTxidConfirmation(tx: Wallet.Entity.EtherTransaction): Promise<void> {
+        try {
+            const rtx = await this.networkClient.checkAndMapTxReceipt(tx);
+            super.fireTxidConfirmation(rtx);
+        } catch (e) {
 
-        return true;
+        }
     }
 
     protected activateConnection() {

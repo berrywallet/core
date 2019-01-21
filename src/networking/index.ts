@@ -12,6 +12,7 @@ export { getNetworkAdapters, getNetworkAdapter } from './utils';
 export function createClient(coin: Coin.CoinInterface, params: Api.TAdapterOption): Clients.NetworkClient {
     switch (params.type) {
         case Adapter.AdapterType.INSIGHT:
+        case Adapter.AdapterType.BLOCKBOOK:
             return new Clients.InsightNetworkClient(coin, params);
 
         case Adapter.AdapterType.INFURA:

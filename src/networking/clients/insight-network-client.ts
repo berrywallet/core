@@ -49,7 +49,9 @@ export class InsightNetworkClient extends NetworkClient {
         };
 
         try {
-            const data = await this.sendRequest('/utils/estimatefee?nbBlocks=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16');
+            const data = await this.sendRequest(
+                '/utils/estimatefee?nbBlocks=1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16'
+            );
 
             return {
                 low: resolveFeePerByte(data, 12, 'lowFeePerByte'),
@@ -119,27 +121,24 @@ export class InsightNetworkClient extends NetworkClient {
     }
 
 
-    protected pureGetAddrsTxs(addrs: string[], from: number = 0, limit: number = 50): Promise<Wallet.Entity.BIPTransaction[]> {
+    protected async pureGetAddrsTxs(addrs: string[], from: number = 0, limit: number = 50): Promise<Wallet.Entity.BIPTransaction[]> {
         if (!addrs.length) {
             throw new Error('There is no addresses to request!');
         }
 
-        const onRequestSuccess = (data: any) => {
-            const rawTxs: Insight.Transaction[] = data.items;
-            const txList: Wallet.Entity.BIPTransaction[] = [];
+        const data: any = await this
+            .sendRequest<Insight.Transaction[]>(`/addrs/${addrs.join(',')}/txs?from=${from}&to=${from + limit}`);
 
-            const extractTxCallback = (tx: Insight.Transaction) => {
-                txList.push(Insight.toWalletTx(tx, this.coin));
-            };
+        const rawTxs: Insight.Transaction[] = data.items;
+        const txList: Wallet.Entity.BIPTransaction[] = [];
 
-            forEach(orderBy(rawTxs, 'blockheight', 'asc'), extractTxCallback);
-
-            return txList;
+        const extractTxCallback = (tx: Insight.Transaction) => {
+            txList.push(Insight.toWalletTx(tx, this.coin));
         };
 
-        return this
-            .sendRequest<Insight.Transaction[]>(`/addrs/${addrs.join(',')}/txs?from=${from}&to=${from + limit}`)
-            .then(onRequestSuccess);
+        forEach(orderBy(rawTxs, 'blockheight', 'asc'), extractTxCallback);
+
+        return txList;
     }
 
 

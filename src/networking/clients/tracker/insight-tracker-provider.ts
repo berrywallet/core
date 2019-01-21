@@ -107,24 +107,22 @@ export class InsightTrackerProvider extends TrackerClient<InsightNetworkClient> 
         return super.fireConnect();
     }
 
-    /**
-     * @param {Block} block
-     */
+
     protected fireNewBlock(block: Wallet.Entity.Block): boolean {
-        forEach(block.txids, (txid) => {
+        forEach(block.txids, async (txid) => {
             if (this.listenerCount('tx.' + txid) === 0) return;
 
-            this.networkClient
-                .getTx(txid)
-                .then((tx) => tx && this.fireTxidConfirmation(tx));
+            const tx = await this.networkClient.getTx(txid);
+
+            if (tx) {
+                this.fireTxidConfirmation(tx);
+            }
         });
 
         return super.fireNewBlock(block);
     }
 
-    /**
-     * @param {string} blockHash
-     */
+
     protected onHandleBlock = async (blockHash: string) => {
         const block: Wallet.Entity.Block = await this.networkClient.getBlock(blockHash);
 

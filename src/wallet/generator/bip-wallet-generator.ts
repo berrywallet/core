@@ -20,12 +20,10 @@ export class BIPWalletGenerator extends WDGenerator {
         const privateProvider = this.wdProvider.getPrivate(this.seed);
         const addrsPromises: Promise<string>[] = [];
 
-        times(addressCount, (num: number) => {
-            addrsPromises.push(this.limiter.schedule(() => {
-                const addr = privateProvider.deriveNew(addressType);
-
-                return Promise.resolve(addr.address);
-            }));
+        times(addressCount, () => {
+            addrsPromises.push(
+                this.limiter.schedule(async () => privateProvider.deriveNew(addressType).address)
+            );
         });
 
         return Promise.all(addrsPromises);

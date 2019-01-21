@@ -44,6 +44,7 @@ export class TrackerClient<T extends INetworkClient> extends EventEmitter implem
         callback: undefined,
     };
 
+
     public constructor(networkClient: T) {
         super();
 
@@ -51,63 +52,42 @@ export class TrackerClient<T extends INetworkClient> extends EventEmitter implem
         this.debug = Debug.create('TRACKER_CLIENT::' + this.networkClient.getCoin().getUnit().toString());
     }
 
-    /**
-     * @param callback
-     * @returns {ITrackerClient}
-     */
+
     public onConnect(callback): ITrackerClient {
         this.on(TrackerEvent.Connect, callback);
 
         return this;
     }
 
-    /**
-     * @param callback
-     * @returns {ITrackerClient}
-     */
+
     public onDisconnect(callback): ITrackerClient {
         this.on(TrackerEvent.Disconnect, callback);
 
         return this;
     }
 
-    /**
-     * @param callback
-     *
-     * @returns {ITrackerClient}
-     */
+
     public onConnectionError(callback): ITrackerClient {
         this.on(TrackerEvent.ConnectionError, callback);
 
         return this;
     }
 
-    /**
-     * @param {NewBlockCallback} callback
-     * @returns {ITrackerClient}
-     */
+
     public onBlock(callback: Events.NewBlockCallback): ITrackerClient {
         this.on(TrackerEvent.Block, callback);
 
         return this;
     }
 
-    /**
-     * @param {string} txid
-     * @param {NewTxCallback} callback
-     *
-     * @returns {ITrackerClient}
-     */
+
     public onTransactionConfirm(txid: string, callback: Events.NewTxCallback): ITrackerClient {
         this.once(`tx.${txid}`, callback);
 
         return this;
     }
 
-    /**
-     * @param {string[]} addrs
-     * @param {NewTxCallback} callback
-     */
+
     public onAddrsTx(addrs: string[], callback: Events.NewTxCallback): ITrackerClient {
         const coinKeyFormatter = this.networkClient.getCoin().getKeyFormat();
 
@@ -123,10 +103,7 @@ export class TrackerClient<T extends INetworkClient> extends EventEmitter implem
         return this;
     }
 
-    /**
-     * @param {string} address
-     * @returns {boolean}
-     */
+
     public isAddrTrack(address: string | Buffer): boolean {
         if (!address) {
             // For the case, when no FROM or TO in transaction
@@ -154,43 +131,28 @@ export class TrackerClient<T extends INetworkClient> extends EventEmitter implem
         });
     }
 
-    /**
-     * @param {Block} block
-     *
-     * @returns {boolean}
-     */
+
     protected fireNewBlock(block: Wallet.Entity.Block): boolean {
         return this.emit(TrackerEvent.Block, block);
     }
 
-    /**
-     * @returns {boolean}
-     */
+
     protected fireConnect(): boolean {
         return this.emit(TrackerEvent.Connect);
     }
 
-    /**
-     * @returns {boolean}
-     */
+
     protected fireDisconnect(): boolean {
         return this.emit(TrackerEvent.Disconnect);
     }
 
-    /**
-     * @param {Error} error
-     *
-     * @returns {boolean}
-     */
+
     protected fireConnectionError(error: Error): boolean {
         return this.emit(TrackerEvent.ConnectionError, error);
     }
 
-    /**
-     * @param {WalletTransaction} tx
-     */
-    protected fireTxidConfirmation(tx: Wallet.Entity.WalletTransaction): boolean {
-        return this.emit(`tx.${tx.txid}`, tx);
+    protected async fireTxidConfirmation(tx: Wallet.Entity.WalletTransaction): Promise<void> {
+        this.emit(`tx.${tx.txid}`, tx);
     }
 
     public destruct() {

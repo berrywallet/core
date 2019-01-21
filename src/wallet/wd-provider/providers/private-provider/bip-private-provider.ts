@@ -7,12 +7,11 @@ import { AbstractPrivateProvider } from './abstract-private-provider';
 import { FeeRecord, InsightNetworkClient } from '../../../../networking/clients';
 
 import coinSelect, { CoinSelectResult } from 'coinselect';
-import { BIPGenericCoin } from 'Coin';
 
 export class BIPPrivateProvider extends AbstractPrivateProvider {
 
-    protected getCoin(): BIPGenericCoin {
-        return super.getCoin() as BIPGenericCoin;
+    protected getCoin(): Coin.BIPGenericCoin {
+        return super.getCoin() as Coin.BIPGenericCoin;
     }
 
     protected async getFee(coin: Coin.BIPGenericCoin, feeType: Coin.FeeTypes): Promise<number> {

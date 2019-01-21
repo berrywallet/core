@@ -11,8 +11,8 @@ gulp.task(
         source: path.resolve('./src/definitions'),
         destination: path.resolve('./lib/definitions'),
         pattern: '**/*.d.ts',
-        transform: flatten(),
-    }),
+        transform: flatten()
+    })
 );
 
 gulp.task(
@@ -35,15 +35,15 @@ gulp.task(
             }
 
             return json;
-        }),
-    }),
+        })
+    })
 );
 
 
 function copyTask(opts) {
     const {source, destination, destinations = [destination], pattern = '**/*', excludePattern, transform} = opts;
 
-    return () => {
+    return function () {
         let stream;
         if (excludePattern !== undefined) {
             stream = gulp.src([path.join(source, pattern), `!${path.join(source, excludePattern)}`], {base: source});

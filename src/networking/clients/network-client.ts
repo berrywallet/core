@@ -83,7 +83,7 @@ export abstract class NetworkClient implements INetworkClient {
      * @todo Must be implement this method for
      */
     public getTracker(): Tracker.ITrackerClient {
-        throw new Error("Tracker Client must be implement!");
+        throw new Error('Tracker Client must be implement!');
     }
 
     public async getBulkAddrsTxs(addrs: string[]): Promise<Wallet.Entity.WalletTransaction[]> {
